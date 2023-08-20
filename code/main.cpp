@@ -7,10 +7,11 @@ int main()
     input += "big.avi";
 
     VideoCapture<const std::string> zxc(input);
-    zxc.displayOriginal();
+    auto zv = zxc.displayOriginal();
 
     std::string output(OUTPUT_DIR);
     output += "output.avi";
 
     VideoWriter abc(output, zxc.getFrameWidth(), zxc.getFrameHeight(), zxc.getFPS());
+    abc.writeVideo(zv);
 }
