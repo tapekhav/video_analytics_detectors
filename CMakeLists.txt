@@ -17,19 +17,14 @@ if (MSVC_VERSION GREATER_EQUAL "1900")
     endif()
 endif()
 
-#if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
- #   add_compile_options(-Wall -Wextra -Werror -Wpedantic -Wconversion -Wformat -Wunused -Wshadow -Wuninitialized -Wsign-compare)
-#elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
- #   add_compile_options(/W4)
-#endif()
-
-add_subdirectory(video_capture)
-
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(video_capture/headers)
 
 add_executable(video_analytics_detectors
-               main.cpp)
+               main.cpp
+               video_capture/headers/video_capture.h)
 
-target_link_libraries(video_analytics_detectors VideoCapture ${OpenCV_LIBS})
+target_link_libraries(video_analytics_detectors ${OpenCV_LIBS})
+
+add_compile_definitions(VIDEOS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/videos/")
