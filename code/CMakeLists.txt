@@ -18,6 +18,7 @@ if (MSVC_VERSION GREATER_EQUAL "1900")
 endif()
 
 add_subdirectory(video_writer)
+add_subdirectory(motion_detection)
 
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
