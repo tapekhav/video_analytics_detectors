@@ -11,7 +11,12 @@ public:
 
     std::vector<cv::Mat> displayOriginal();
 
-    ~VideoCapture();
+    [[nodiscard]] inline int getFrameWidth() const { return static_cast<int>(_cam.get(cv::CAP_PROP_FRAME_WIDTH)); }
+    [[nodiscard]] inline int getFrameHeight() const { return static_cast<int>(_cam.get(cv::CAP_PROP_FRAME_HEIGHT)); }
+
+    [[nodiscard]] inline double getFPS() const { _cam.get(cv::CAP_PROP_FPS); }
+
+    inline ~VideoCapture() {_cam.release(); }
 protected:
     cv::VideoCapture _cam;
 };
@@ -42,10 +47,5 @@ std::vector<cv::Mat> VideoCapture<T>::displayOriginal()
     }
 }
 
-template<class T>
-VideoCapture<T>::~VideoCapture()
-{
-    _cam.release();
-}
 
 #endif //VIDEO_ANALYTICS_DETECTORS_ABSTRACTVIDEOCAPTURE_H

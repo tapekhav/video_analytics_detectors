@@ -1,10 +1,16 @@
 #include <video_capture.h>
-
+#include <video_writing.h>
 
 int main()
 {
-    std::string result_dir(VIDEOS_DIR);
-    result_dir += "big.avi";
-    VideoCapture<const std::string> zxc(result_dir);
+    std::string input(VIDEOS_DIR);
+    input += "big.avi";
+
+    VideoCapture<const std::string> zxc(input);
     zxc.displayOriginal();
+
+    std::string output(OUTPUT_DIR);
+    output += "output.avi";
+
+    VideoWriter abc(output, zxc.getFrameWidth(), zxc.getFrameHeight(), zxc.getFPS());
 }
