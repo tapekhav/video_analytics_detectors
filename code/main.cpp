@@ -1,5 +1,6 @@
 #include <video_capture.h>
 #include <video_writing.h>
+#include <opencv_detection.h>
 
 int main()
 {
@@ -11,6 +12,12 @@ int main()
 
     std::string output(OUTPUT_DIR);
     output += "output.avi";
+
+    OpenCVDetection aaaa;
+    for (auto i : zv)
+    {
+        aaaa.detectMotion(i);
+    }
 
     VideoWriter abc(output, zxc.getFrameWidth(), zxc.getFrameHeight(), zxc.getFPS());
     abc.writeVideo(zv);
