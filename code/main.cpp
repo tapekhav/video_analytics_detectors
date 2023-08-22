@@ -5,7 +5,7 @@
 int main()
 {
     std::string input(VIDEOS_DIR);
-    input += "big.avi";
+    input += "high.avi";
 
     VideoCapture<const std::string> zxc(input);
     auto zv = zxc.displayOriginal();
