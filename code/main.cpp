@@ -5,7 +5,7 @@
 int main()
 {
     std::string input(VIDEOS_DIR);
-    input += "high.avi";
+    input += "one_more.avi";
 
     VideoCapture<const std::string> zxc(input);
     auto zv = zxc.displayOriginal();
@@ -13,10 +13,10 @@ int main()
     std::string output(OUTPUT_DIR);
     output += "output.avi";
 
-    OpenCVDetection aaaa;
-    for (auto i : zv)
+    for (size_t i = 1; i < zv.size(); ++i)
     {
-        aaaa.detectMotion(i);
+        OpenCVDetection aaaa(15, {zxc.getFrameWidth(), zxc.getFrameHeight()});
+        aaaa.detectMotion(zv[i], zv[i - 1]);
     }
 
     VideoWriter abc(output, zxc.getFrameWidth(), zxc.getFrameHeight(), zxc.getFPS());
