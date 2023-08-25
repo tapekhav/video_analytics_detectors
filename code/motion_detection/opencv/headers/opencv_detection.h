@@ -3,8 +3,11 @@
 
 #include <deque>
 #include <utility>
+#include <cmath>
 
 #include <opencv4/opencv2/opencv.hpp>
+
+#include <geometry.h>
 
 class OpenCVDetection
 {
@@ -14,7 +17,7 @@ public:
                              : _threshold_value(threshold),
                                _params(std::move(params)),
                                _sum_frames(cv::Mat::zeros(_params, CV_8UC3)),
-                               _capacity(15) {}
+                               _capacity(10) {}
 
     void detectMotion(cv::Mat& cur_frame);
 
@@ -23,6 +26,8 @@ public:
     void addFrames(const cv::Mat& cur_frame);
 
     void changeSum(const cv::Mat& cur_frame);
+
+    cv::Mat getMeanSum() const;
 private:
     int _threshold_value;
     cv::Size _params;
