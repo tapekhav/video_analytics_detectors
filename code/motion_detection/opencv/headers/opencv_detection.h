@@ -21,7 +21,7 @@ public:
 
     void detectMotion(cv::Mat& cur_frame);
 
-    cv::Mat getAbsDiff(const cv::Mat& cur_frame);
+    cv::Mat getAbsDiff(const cv::Mat& cur_frame) const;
 
     void addFrames(const cv::Mat& cur_frame);
 
