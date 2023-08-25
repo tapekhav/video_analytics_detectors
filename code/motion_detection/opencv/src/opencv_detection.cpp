@@ -1,6 +1,6 @@
 #include <opencv_detection.h>
 
-static const int k_thickness = 4;
+static const int k_thickness = 7;
 static const int k_max_threshold_value = 255;
 
 void OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
@@ -11,15 +11,13 @@ void OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
     }
 
     cv::Mat diff = getAbsDiff(cur_frame);
-
     changeSum(cur_frame);
 
-    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(9, 9));
+    cv::GaussianBlur(diff, diff, cv::Size(17, 17), 0, 0);
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
     cv::dilate(diff, diff, kernel);
 
-    cv::GaussianBlur(diff, diff, cv::Size(17, 17), 0, 0);
-
-    cv::threshold(diff, diff, 114, k_max_threshold_value, cv::THRESH_BINARY);
+    cv::threshold(diff, diff, 115, k_max_threshold_value, cv::THRESH_BINARY);
 
     cv::cvtColor(diff, diff, cv::COLOR_BGR2GRAY);
     std::vector<std::vector<cv::Point>> contours;
