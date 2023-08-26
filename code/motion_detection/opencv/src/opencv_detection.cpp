@@ -13,13 +13,12 @@ void OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
     cv::Mat diff = getAbsDiff(cur_frame);
     changeSum(cur_frame);
 
-    cv::GaussianBlur(diff, diff, cv::Size(17, 17), 0, 0);
-    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
+    cv::GaussianBlur(diff, diff, cv::Size(7, 7), 0, 0);
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
     cv::dilate(diff, diff, kernel);
 
     cv::threshold(diff, diff, 35, k_max_threshold_value, cv::THRESH_BINARY);
 
-    cv::cvtColor(diff, diff, cv::COLOR_BGR2GRAY);
     std::vector<std::vector<cv::Point>> contours;
     cv::findContours(diff, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
@@ -43,7 +42,6 @@ void OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
         {
             cv::Rect bound_rect = cv::boundingRect(contours[i]);
             rectangles.push_back(bound_rect);
-            cv::rectangle(cur_frame, bound_rect, red_color, k_thickness, cv::LINE_8);
         }
     }
 
@@ -75,6 +73,11 @@ void OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
             rectangles.erase(rectangles.begin() + static_cast<long>(i));
         }
     }
+
+    for (const auto& rect : rectangles)
+    {
+        cv::rectangle(cur_frame, rect, red_color, k_thickness, cv::LINE_8);
+    }
 }
 
 cv::Mat OpenCVDetection::getAbsDiff(const cv::Mat &cur_frame) const
@@ -82,6 +85,8 @@ cv::Mat OpenCVDetection::getAbsDiff(const cv::Mat &cur_frame) const
     cv::Mat diff, sum;
     sum = getMeanSum();
     cv::absdiff(cur_frame, sum, diff);
+
+    cv::cvtColor(diff, diff, cv::COLOR_BGR2GRAY);
 
     // cv::namedWindow("diff", cv::WINDOW_NORMAL);
     // cv::imshow("diff", diff);
@@ -93,7 +98,7 @@ cv::Mat OpenCVDetection::getAbsDiff(const cv::Mat &cur_frame) const
 void OpenCVDetection::addFrames(const cv::Mat& cur_frame)
 {
     cv::Mat frame;
-    cv::GaussianBlur(cur_frame, frame, cv::Size(5, 5), 0, 0);
+    cv::GaussianBlur(cur_frame, frame, cv::Size(7, 7), 0, 0);
 
     _sum_frames += cur_frame;
     _frames.push_back(frame);
@@ -102,7 +107,7 @@ void OpenCVDetection::addFrames(const cv::Mat& cur_frame)
 void OpenCVDetection::changeSum(const cv::Mat &cur_frame)
 {
     cv::Mat frame;
-    cv::GaussianBlur(cur_frame, frame, cv::Size(5, 5), 0, 0);
+    cv::GaussianBlur(cur_frame, frame, cv::Size(7, 7), 0, 0);
     addFrames(frame);
 
     _sum_frames -= _frames.front();
