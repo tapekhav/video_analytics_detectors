@@ -13,7 +13,7 @@ int main()
     std::string output(OUTPUT_DIR);
     output += "output.avi";
 
-    OpenCVDetection aaaa(150, {zxc.getFrameWidth(), zxc.getFrameHeight()});
+    OpenCVDetection aaaa({zxc.getFrameWidth(), zxc.getFrameHeight()});
 
     for (auto & frame : zv)
     {
