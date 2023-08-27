@@ -7,7 +7,7 @@
 class Geometry
 {
 public:
-    static std::vector<cv::Point> mergeContours(std::vector<cv::Point> first, std::vector<cv::Point> second);
+    static void mergeContours(std::vector<cv::Point>& first, const std::vector<cv::Point>& second);
     static double checkDistContours(const std::vector<cv::Point>& first, const std::vector<cv::Point>& second);
 
     static bool isInnerRectangle(const cv::Rect& first, const cv::Rect& second);

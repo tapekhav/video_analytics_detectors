@@ -1,12 +1,8 @@
 #include "../headers/geometry.h"
 
-std::vector<cv::Point> Geometry::mergeContours(std::vector<cv::Point> first, std::vector<cv::Point> second)
+void Geometry::mergeContours(std::vector<cv::Point>& first, const std::vector<cv::Point>& second)
 {
-    std::vector<cv::Point> merged_contour;
-    merged_contour.insert(merged_contour.end(), first.begin(), first.end());
-    merged_contour.insert(merged_contour.end(), second.begin(), second.end());
-
-    return merged_contour;
+    first.insert(first.end(), second.begin(), second.end());
 }
 
 double Geometry::checkDistContours(const std::vector<cv::Point>& first, const std::vector<cv::Point>& second)

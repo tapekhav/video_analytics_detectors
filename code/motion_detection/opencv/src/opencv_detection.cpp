@@ -34,7 +34,7 @@ void OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
 
         if (Geometry::checkDistContours(contours[i], contours[i + 1]) < background_min_area * 0.1)
         {
-            contours[i] = Geometry::mergeContours(contours[i], contours[i + 1]);
+            Geometry::mergeContours(contours[i], contours[i + 1]);
         }
 
         if (area < background_area_threshold && area > background_min_area)
@@ -100,7 +100,7 @@ cv::Mat OpenCVDetection::getAbsDiff(const cv::Mat &cur_frame) const
 void OpenCVDetection::addFrames(const cv::Mat& cur_frame)
 {
     cv::Mat frame;
-    cv::GaussianBlur(cur_frame, frame, cv::Size(17, 17), 0, 0);
+    cv::GaussianBlur(cur_frame, frame, cv::Size(15, 15), 0, 0);
 
     _sum_frames += frame;
     _frames.push_back(frame);
