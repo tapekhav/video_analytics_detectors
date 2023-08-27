@@ -13,11 +13,11 @@ void OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
     cv::Mat diff = getAbsDiff(cur_frame);
     changeSum(cur_frame);
 
-    cv::GaussianBlur(diff, diff, cv::Size(7, 7), 0, 0);
+    // cv::GaussianBlur(diff, diff, cv::Size(7, 7), 0, 0);
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
     cv::dilate(diff, diff, kernel);
 
-    cv::threshold(diff, diff, 35, k_max_threshold_value, cv::THRESH_BINARY);
+    cv::threshold(diff, diff, 43, k_max_threshold_value, cv::THRESH_BINARY);
 
     std::vector<std::vector<cv::Point>> contours;
     cv::findContours(diff, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
@@ -25,15 +25,14 @@ void OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
     cv::Scalar red_color(0, 0, 255);
 
     double background_area_threshold = 0.05 * _params.height * _params.width;
-    double background_min_area = 3e-5 * _params.height * _params.width;
+    double background_min_area = 1e-4 * _params.height * _params.width;
 
     std::vector<cv::Rect> rectangles;
     for (size_t i = 0; i < contours.size() - 1; ++i)
     {
-        // std::cout << contour << "\n";
         double area = cv::contourArea(contours[i]);
 
-        if (Geometry::checkDistContours(contours[i], contours[i + 1]) < 10)
+        if (Geometry::checkDistContours(contours[i], contours[i + 1]) < background_min_area * 0.1)
         {
             contours[i] = Geometry::mergeContours(contours[i], contours[i + 1]);
         }
@@ -47,7 +46,7 @@ void OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
 
     auto sortByArea = [](const cv::Rect& first, const cv::Rect& second)
     {
-        return first.width * first.height > second.height * second.width;
+        return first.width * first.height < second.height * second.width;
     };
 
     std::sort(rectangles.begin(), rectangles.end(), sortByArea);
@@ -71,6 +70,8 @@ void OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
         if (mask[i])
         {
             rectangles.erase(rectangles.begin() + static_cast<long>(i));
+            mask.erase(mask.begin() + static_cast<long>(i));
+            --i;
         }
     }
 
@@ -78,6 +79,7 @@ void OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
     {
         cv::rectangle(cur_frame, rect, red_color, k_thickness, cv::LINE_8);
     }
+
 }
 
 cv::Mat OpenCVDetection::getAbsDiff(const cv::Mat &cur_frame) const
@@ -98,17 +100,17 @@ cv::Mat OpenCVDetection::getAbsDiff(const cv::Mat &cur_frame) const
 void OpenCVDetection::addFrames(const cv::Mat& cur_frame)
 {
     cv::Mat frame;
-    cv::GaussianBlur(cur_frame, frame, cv::Size(7, 7), 0, 0);
+    cv::GaussianBlur(cur_frame, frame, cv::Size(17, 17), 0, 0);
 
-    _sum_frames += cur_frame;
+    _sum_frames += frame;
     _frames.push_back(frame);
 }
 
 void OpenCVDetection::changeSum(const cv::Mat &cur_frame)
 {
-    cv::Mat frame;
-    cv::GaussianBlur(cur_frame, frame, cv::Size(7, 7), 0, 0);
-    addFrames(frame);
+    //cv::Mat frame;
+    // cv::GaussianBlur(cur_frame, frame, cv::Size(7, 7), 0, 0);
+    addFrames(cur_frame);
 
     _sum_frames -= _frames.front();
     _frames.pop_front();
