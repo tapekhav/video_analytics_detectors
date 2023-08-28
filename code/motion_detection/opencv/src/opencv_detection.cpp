@@ -1,7 +1,5 @@
 #include <opencv_detection.h>
 
-static const int k_thickness = 4;
-static const int k_max_threshold_value = 255;
 
 void OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
     if (_frames.size() != _capacity)
@@ -38,7 +36,7 @@ void OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
 
     for (const auto& rect : rectangles)
     {
-        cv::rectangle(cur_frame, rect, red_color, k_thickness, cv::LINE_8);
+        cv::rectangle(cur_frame, rect, red_color, Constants::Thickness::MEDIUM, cv::LINE_8);
     }
 }
 
@@ -125,7 +123,7 @@ std::vector<std::vector<cv::Point>> OpenCVDetection::findContours(const cv::Mat 
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, _dilate_kernel_size);
     cv::dilate(diff, diff, kernel);
 
-    cv::threshold(diff, diff, _threshold_value, k_max_threshold_value, cv::THRESH_BINARY);
+    cv::threshold(diff, diff, _threshold_value, Constants::Thresholds::MAX_THRESHOLDS, cv::THRESH_BINARY);
 
     std::vector<std::vector<cv::Point>> contours;
     cv::findContours(diff, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);

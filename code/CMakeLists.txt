@@ -20,7 +20,6 @@ endif()
 add_subdirectory(video_writer)
 add_subdirectory(motion_detection)
 add_subdirectory(utilities)
-add_subdirectory(trajectory_detection)
 
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
@@ -29,13 +28,13 @@ include_directories(video_capture/headers)
 include_directories(video_writer/headers)
 include_directories(motion_detection/opencv/headers)
 include_directories(utilities/headers)
-include_directories(trajectory_detection/headers)
+include_directories(motion_detection/trajectory_detection/headers)
 
 add_executable(video_analytics_detectors
                main.cpp
                video_capture/headers/video_capture.h)
 
-target_link_libraries(video_analytics_detectors VideoWriter Opencv Trajectory Utility ${OpenCV_LIBS})
+target_link_libraries(video_analytics_detectors VideoWriter Opencv Utility Trajectory ${OpenCV_LIBS})
 
 add_compile_definitions(VIDEOS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../assets/videos/")
 add_compile_definitions(OUTPUT_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../assets/output/")

@@ -13,9 +13,9 @@ class OpenCVDetection
 {
 public:
     explicit OpenCVDetection(cv::Size params = {200, 200},
-                             int threshold = 43,
+                             int threshold = Constants::Thresholds::THRESHOLD_VALUE,
                              cv::Size dilate_kernel_size = {3, 3},
-                             size_t _frames = 15,
+                             size_t _frames = Constants::Memory::MOTION_DETECTION_MEMORY,
                              cv::Size blur_kernel_size = {15, 15})
                              : _params(std::move(params)),
                                _threshold_value(threshold),
