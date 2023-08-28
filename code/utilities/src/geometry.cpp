@@ -1,4 +1,4 @@
-#include "../headers/geometry.h"
+#include <geometry.h>
 
 void Geometry::mergeContours(std::vector<cv::Point>& first, const std::vector<cv::Point>& second)
 {
@@ -40,4 +40,5 @@ bool Geometry::isInnerRectangle(const cv::Rect& first, const cv::Rect& second)
 
     return false;
 }
+
 

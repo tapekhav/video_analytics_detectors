@@ -12,14 +12,15 @@
 class OpenCVDetection
 {
 public:
-    explicit OpenCVDetection(int threshold = 115,
-                             cv::Size params = {200, 200})
-                             : _threshold_value(threshold),
-                               _params(std::move(params)),
-                               _sum_frames(cv::Mat::zeros(_params, CV_8UC3)),
-                               _capacity(20) {}
+    explicit OpenCVDetection(cv::Size params = {200, 200},
+                             int threshold = Constants::Thresholds::THRESHOLD_VALUE,
+                             cv::Size dilate_kernel_size = {3, 3},
+                             size_t _frames = Constants::Memory::MOTION_DETECTION_MEMORY,
+                             cv::Size blur_kernel_size = {15, 15});
 
-    void detectMotion(cv::Mat& cur_frame);
+    std::vector<cv::Rect> detectMotion(cv::Mat& cur_frame);
+private:
+    std::vector<std::vector<cv::Point>> findContours(const cv::Mat& cur_frame);
 
     [[nodiscard]] cv::Mat getAbsDiff(const cv::Mat& cur_frame) const;
 
@@ -27,10 +28,16 @@ public:
 
     void changeSum(const cv::Mat& cur_frame);
 
+    void changeRectangles(std::vector<cv::Rect>& rectangles);
+
     [[nodiscard]] cv::Mat getMeanSum() const;
+
 private:
-    int _threshold_value;
     cv::Size _params;
+    int _threshold_value;
+
+    cv::Size _dilate_kernel_size;
+    cv::Size _blur_kernel_size;
 
     const size_t _capacity;
     cv::Mat _sum_frames;

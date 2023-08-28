@@ -9,4 +9,4 @@ file(GLOB OPENCV_HEADERS headers/*.h)
 file(GLOB OPENCV_SOURCE src/*.cpp)
 
 add_library(Opencv ${OPENCV_HEADERS} ${OPENCV_SOURCE})
-target_link_libraries(Opencv ${OpenCV_LIBS})
+target_link_libraries(Opencv Utility ${OpenCV_LIBS})
