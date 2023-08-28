@@ -32,7 +32,7 @@ std::vector<cv::Rect> OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
         }
     }
 
-    changeRectangles(rectangles);
+    deleteInnerRectangles(rectangles);
 
     for (const auto& rect : rectangles)
     {
@@ -82,12 +82,12 @@ cv::Mat OpenCVDetection::getMeanSum() const
     return sum;
 }
 
-void OpenCVDetection::changeRectangles(std::vector<cv::Rect> &rectangles)
+void OpenCVDetection::deleteInnerRectangles(std::vector<cv::Rect> &rectangles)
 {
     auto sortByArea = [](const cv::Rect& first, const cv::Rect& second)
     {
         //! TODO check sign
-        return first.width * first.height < second.height * second.width;
+        return first.width * first.height > second.height * second.width;
     };
 
     std::sort(rectangles.begin(), rectangles.end(), sortByArea);
@@ -131,6 +131,31 @@ std::vector<std::vector<cv::Point>> OpenCVDetection::findContours(const cv::Mat 
     cv::findContours(diff, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
     return contours;
+}
+
+
+void OpenCVDetection::findPermanentRectangles(std::vector<cv::Rect> &rectangles)
+{
+    std::vector<bool> used_rectangles(rectangles.size(), false);
+    if (_prev_rectangles.empty())
+    {
+        for (const auto& rect : rectangles)
+        {
+            _prev_rectangles.push_back(rect);
+            _rectangles_center.emplace_back(0, 0, true);
+        }
+        return;
+    }
+
+    for (size_t i = 0; i < rectangles.size(); ++i)
+    {
+        cv::Rect extended_rect = { rectangles[i].x - _max_deviation, rectangles[i].y - _max_deviation,
+                                   rectangles[i].width + 2 * _max_deviation, rectangles[i].height + 2 * _max_deviation };
+        for (size_t j = 0; j < _prev_rectangles.size(); ++j)
+        {
+        }
+    }
+
 }
 
 OpenCVDetection::OpenCVDetection(cv::Size params,
