@@ -162,10 +162,16 @@ OpenCVDetection::OpenCVDetection(cv::Size params,
                                  int threshold,
                                  cv::Size dilate_kernel_size,
                                  size_t _frames,
-                                 cv::Size blur_kernel_size)
+                                 cv::Size blur_kernel_size,
+                                 int max_deviation,
+                                 int patience,
+                                 int max_elapsed_time)
                                 : _params(std::move(params)),
                                   _threshold_value(threshold),
                                   _dilate_kernel_size(std::move(dilate_kernel_size)),
                                   _blur_kernel_size(std::move(blur_kernel_size)),
                                   _sum_frames(cv::Mat::zeros(_params, CV_8UC3)),
-                                  _capacity(_frames) {}
+                                  _capacity(_frames),
+                                  _max_deviation(max_deviation),
+                                  _max_elapsed_time(max_elapsed_time),
+                                  _patience(patience) {}
