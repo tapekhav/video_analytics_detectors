@@ -4,11 +4,11 @@ void ObjectTracking::OneRectangleTrajectory(cv::Mat& frame, size_t id, const cv:
 {
     if (_history.empty())
     {
-        auto first_point = Geometry::findCenter(rectangle);
+        auto first_point = geom::findCenter(rectangle);
         _history[id].push(first_point);
     }
 
-    auto last_point = Geometry::findCenter(rectangle);
+    auto last_point = geom::findCenter(rectangle);
 
     cv::line(frame, _history[id].front(), last_point, Constants::color_map.at(TURQUOISE), Constants::Thickness::THICK,
                                                                                           cv::LineTypes::LINE_8);
@@ -20,6 +20,7 @@ void ObjectTracking::OneRectangleTrajectory(cv::Mat& frame, size_t id, const cv:
     }
 }
 
+//! TODO допилить алгоритм трекинга
 void ObjectTracking::writeTrajectory(cv::Mat &frame, const std::vector<cv::Rect>& rectangles)
 {
     for (const auto& frame_points : _history)

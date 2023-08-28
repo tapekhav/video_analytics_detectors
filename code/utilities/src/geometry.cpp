@@ -1,11 +1,11 @@
 #include <geometry.h>
 
-void Geometry::mergeContours(std::vector<cv::Point>& first, const std::vector<cv::Point>& second)
+void geom::mergeContours(std::vector<cv::Point>& first, const std::vector<cv::Point>& second)
 {
     first.insert(first.end(), second.begin(), second.end());
 }
 
-double Geometry::checkDistContours(const std::vector<cv::Point>& first, const std::vector<cv::Point>& second)
+double geom::checkDistContours(const std::vector<cv::Point>& first, const std::vector<cv::Point>& second)
 {
     double min_distance = std::numeric_limits<double>::max();
 
@@ -21,14 +21,14 @@ double Geometry::checkDistContours(const std::vector<cv::Point>& first, const st
     return min_distance;
 }
 
-double Geometry::calculateDistance(const cv::Point &p1, const cv::Point &p2)
+double geom::calculateDistance(const cv::Point &p1, const cv::Point &p2)
 {
     double dx = p1.x - p2.x;
     double dy = p1.y - p2.y;
     return std::sqrt(dx * dx + dy * dy);
 }
 
-bool Geometry::isInnerRectangle(const cv::Rect& first, const cv::Rect& second)
+bool geom::isInnerRectangle(const cv::Rect& first, const cv::Rect& second)
 {
     return isInnerPoint({first.x, first.y}, second) ||
            isInnerPoint({first.x + first.width, first.y}, second) ||

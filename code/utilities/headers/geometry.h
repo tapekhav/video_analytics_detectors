@@ -4,7 +4,7 @@
 #include <vector>
 #include <opencv4/opencv2/opencv.hpp>
 
-namespace Geometry
+namespace geom
 {
     void mergeContours(std::vector<cv::Point> &first, const std::vector<cv::Point> &second);
 

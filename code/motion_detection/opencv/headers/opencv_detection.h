@@ -45,7 +45,7 @@ private:
     cv::Size _blur_kernel_size;
 
     std::vector<cv::Rect> _prev_rectangles;
-    std::vector<std::tuple<int, int, bool>> _rectangles_center;
+    std::map<size_t, std::tuple<int, int, bool>> _rectangles_center;
 
     const int _max_deviation;
     const int _patience;

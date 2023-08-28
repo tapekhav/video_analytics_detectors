@@ -36,9 +36,9 @@ std::vector<cv::Rect> OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
     {
         double area = cv::contourArea(contours[i]);
 
-        if (Geometry::checkDistContours(contours[i], contours[i + 1]) < background_min_area * 0.1)
+        if (geom::checkDistContours(contours[i], contours[i + 1]) < background_min_area * 0.1)
         {
-            Geometry::mergeContours(contours[i], contours[i + 1]);
+            geom::mergeContours(contours[i], contours[i + 1]);
         }
 
         if (area < background_area_threshold && area > background_min_area)
@@ -118,7 +118,7 @@ void OpenCVDetection::deleteInnerRectangles(std::vector<cv::Rect> &rectangles)
 
         for (size_t j = i + 1; j < rectangles.size(); ++j)
         {
-            mask[j] = Geometry::isInnerRectangle(rectangles[j], rectangles[i]);
+            mask[j] = geom::isInnerRectangle(rectangles[j], rectangles[i]);
         }
     }
 
@@ -155,10 +155,10 @@ void OpenCVDetection::findPermanentRectangles(std::vector<cv::Rect> &rectangles)
     std::vector<bool> used_rectangles(rectangles.size(), false);
     if (_prev_rectangles.empty())
     {
-        for (const auto& rect : rectangles)
+        for (size_t i = 0; i < rectangles.size(); ++i)
         {
-            _prev_rectangles.push_back(rect);
-            _rectangles_center.emplace_back(0, 0, true);
+            _prev_rectangles.push_back(rectangles[i]);
+            _rectangles_center[i] = {0, 0, true};
         }
         return;
     }
@@ -169,7 +169,43 @@ void OpenCVDetection::findPermanentRectangles(std::vector<cv::Rect> &rectangles)
                                    rectangles[i].width + 2 * _max_deviation, rectangles[i].height + 2 * _max_deviation };
         for (size_t j = 0; j < _prev_rectangles.size(); ++j)
         {
+            auto value = _rectangles_center.find(j) == _rectangles_center.end() ? std::tuple<int, int, bool>(0, 0, false)
+                                                                                : _rectangles_center[j];
+            std::tuple<int, int, bool> center_value = {std::get<0>(value), std::get<1>(value), false};
+            if (geom::isInnerPoint(geom::findCenter(rectangles[j]), extended_rect))
+            {
+                _prev_rectangles[j] = rectangles[i];
+                used_rectangles[j] = true;
+
+                auto [cnt, time, flag] = _rectangles_center[i];
+                std::tuple<int, int, bool> rectangle_center = {cnt + 1, 0, true};
+                _rectangles_center[i] = rectangle_center;
+
+                break;
+            }
         }
+    }
+
+    std::vector<size_t> ids;
+    for (auto& rect_center : _rectangles_center)
+    {
+        auto [cnt, time, is_in_frame] = rect_center.second;
+        if (is_in_frame)
+        {
+            ++time;
+            rect_center.second = {cnt, time, is_in_frame};
+
+            if (time >= _max_elapsed_time)
+            {
+                ids.push_back(rect_center.first);
+            }
+        }
+    }
+    //! TODO end algorithm tomorrow
+    for (const auto& id : ids)
+    {
+        std::remove(_prev_rectangles.begin(), _prev_rectangles.end(), id);
+
     }
 
 }
