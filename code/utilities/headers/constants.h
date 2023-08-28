@@ -1,7 +1,7 @@
 #ifndef VIDEO_ANALYTICS_DETECTORS_CONSTANTS_H
 #define VIDEO_ANALYTICS_DETECTORS_CONSTANTS_H
 
-#include <map>
+#include <protected_map.h>
 
 #include <opencv4/opencv2/opencv.hpp>
 
@@ -13,7 +13,6 @@ enum Color
     TURQUOISE
 };
 
-//!TODO write ProtectedMap if i'll have time
 namespace Constants
 {
     enum Thickness
@@ -23,7 +22,7 @@ namespace Constants
         THICK = 8
     };
 
-    static std::map<Color, cv::Scalar> color_map =
+    static ProtectedMap<Color, cv::Scalar> color_map =
     {
             {RED, cv::Scalar(0, 0, 255)},
             {GREEN, cv::Scalar(0, 255, 0)},
