@@ -1,13 +1,11 @@
 #include <opencv_detection.h>
 
-static const int k_thickness = 4;
-static const int k_max_threshold_value = 255;
 
-void OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
+std::vector<cv::Rect> OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
     if (_frames.size() != _capacity)
     {
         addFrames(cur_frame);
-        return;
+        return {};
     }
 
     std::vector<std::vector<cv::Point>> contours = findContours(cur_frame);
@@ -38,8 +36,10 @@ void OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
 
     for (const auto& rect : rectangles)
     {
-        cv::rectangle(cur_frame, rect, red_color, k_thickness, cv::LINE_8);
+        cv::rectangle(cur_frame, rect, red_color, Constants::Thickness::MEDIUM, cv::LINE_8);
     }
+
+    return rectangles;
 }
 
 cv::Mat OpenCVDetection::getAbsDiff(const cv::Mat &cur_frame) const
@@ -125,13 +125,14 @@ std::vector<std::vector<cv::Point>> OpenCVDetection::findContours(const cv::Mat 
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, _dilate_kernel_size);
     cv::dilate(diff, diff, kernel);
 
-    cv::threshold(diff, diff, _threshold_value, k_max_threshold_value, cv::THRESH_BINARY);
+    cv::threshold(diff, diff, _threshold_value, Constants::Thresholds::MAX_THRESHOLDS, cv::THRESH_BINARY);
 
     std::vector<std::vector<cv::Point>> contours;
     cv::findContours(diff, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
     return contours;
 }
+
 
 void OpenCVDetection::findPermanentRectangles(std::vector<cv::Rect> &rectangles)
 {
@@ -156,3 +157,15 @@ void OpenCVDetection::findPermanentRectangles(std::vector<cv::Rect> &rectangles)
     }
 
 }
+
+OpenCVDetection::OpenCVDetection(cv::Size params,
+                                 int threshold,
+                                 cv::Size dilate_kernel_size,
+                                 size_t _frames,
+                                 cv::Size blur_kernel_size)
+                                : _params(std::move(params)),
+                                  _threshold_value(threshold),
+                                  _dilate_kernel_size(std::move(dilate_kernel_size)),
+                                  _blur_kernel_size(std::move(blur_kernel_size)),
+                                  _sum_frames(cv::Mat::zeros(_params, CV_8UC3)),
+                                  _capacity(_frames) {}

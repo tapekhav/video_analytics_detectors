@@ -17,10 +17,12 @@ class OpenCVDetection
 {
 public:
     explicit OpenCVDetection(cv::Size params = {200, 200},
-                             int threshold = 43,
+                             int threshold = Constants::Thresholds::THRESHOLD_VALUE,
                              cv::Size dilate_kernel_size = {3, 3},
+                             size_t _frames = Constants::Memory::MOTION_DETECTION_MEMORY,
+                             cv::Size blur_kernel_size = {15, 15});
+
                              size_t _frames = 15,
-                             cv::Size blur_kernel_size = {15, 15},
                              int max_deviation = k_max_deviation,
                              int patience = k_patience,
                              int max_elapsed_time = k_max_elapsed_time)
@@ -34,8 +36,9 @@ public:
                                _max_elapsed_time(max_elapsed_time),
                                _patience(patience) {}
 
-    void detectMotion(cv::Mat& cur_frame);
-private:
+    std::vector<cv::Rect> detectMotion(cv::Mat& cur_frame);
+
+  private:
     std::vector<std::vector<cv::Point>> findContours(const cv::Mat& cur_frame);
 
     [[nodiscard]] cv::Mat getAbsDiff(const cv::Mat& cur_frame) const;

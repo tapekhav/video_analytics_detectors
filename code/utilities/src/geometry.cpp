@@ -41,3 +41,4 @@ bool Geometry::isInnerRectangle(const cv::Rect& first, const cv::Rect& second)
     return false;
 }
 
+
