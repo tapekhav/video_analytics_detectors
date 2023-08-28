@@ -6,6 +6,7 @@
 
 
 //!TODO Put it in another file
+//!TODO add colors to Constants
 namespace Constants
 {
     enum Thickness

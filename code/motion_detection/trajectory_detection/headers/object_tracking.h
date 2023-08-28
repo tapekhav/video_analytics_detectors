@@ -1,8 +1,6 @@
 #ifndef VIDEO_ANALYTICS_DETECTORS_OBJECT_TRACKING_H
 #define VIDEO_ANALYTICS_DETECTORS_OBJECT_TRACKING_H
 
-#include <map>
-
 #include <geometry.h>
 
 #include <opencv4/opencv2/opencv.hpp>

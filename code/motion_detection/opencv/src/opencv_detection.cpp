@@ -130,3 +130,15 @@ std::vector<std::vector<cv::Point>> OpenCVDetection::findContours(const cv::Mat 
 
     return contours;
 }
+
+OpenCVDetection::OpenCVDetection(cv::Size params,
+                                 int threshold,
+                                 cv::Size dilate_kernel_size,
+                                 size_t _frames,
+                                 cv::Size blur_kernel_size)
+                                : _params(std::move(params)),
+                                  _threshold_value(threshold),
+                                  _dilate_kernel_size(std::move(dilate_kernel_size)),
+                                  _blur_kernel_size(std::move(blur_kernel_size)),
+                                  _sum_frames(cv::Mat::zeros(_params, CV_8UC3)),
+                                  _capacity(_frames) {}
