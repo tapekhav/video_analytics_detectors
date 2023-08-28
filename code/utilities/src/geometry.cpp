@@ -30,15 +30,10 @@ double Geometry::calculateDistance(const cv::Point &p1, const cv::Point &p2)
 
 bool Geometry::isInnerRectangle(const cv::Rect& first, const cv::Rect& second)
 {
-    if (isInnerPoint({first.x, first.y}, second) ||
-        isInnerPoint({first.x + first.width, first.y}, second) ||
-        isInnerPoint({first.x, first.y + first.height}, second) ||
-        isInnerPoint({first.x + first.width, first.y + first.height}, second))
-    {
-        return true;
-    }
-
-    return false;
+    return isInnerPoint({first.x, first.y}, second) ||
+           isInnerPoint({first.x + first.width, first.y}, second) ||
+           isInnerPoint({first.x, first.y + first.height}, second) ||
+           isInnerPoint({first.x + first.width, first.y + first.height}, second);
 }
 
 

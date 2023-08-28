@@ -1,6 +1,24 @@
 #include <opencv_detection.h>
 
 
+OpenCVDetection::OpenCVDetection(cv::Size params,
+                                 int threshold,
+                                 cv::Size dilate_kernel_size,
+                                 size_t _frames,
+                                 cv::Size blur_kernel_size,
+                                 int max_deviation,
+                                 int patience,
+                                 int max_elapsed_time)
+        : _params(std::move(params)),
+          _threshold_value(threshold),
+          _dilate_kernel_size(std::move(dilate_kernel_size)),
+          _blur_kernel_size(std::move(blur_kernel_size)),
+          _sum_frames(cv::Mat::zeros(_params, CV_8UC3)),
+          _capacity(_frames),
+          _max_deviation(max_deviation),
+          _max_elapsed_time(max_elapsed_time),
+          _patience(patience) {}
+
 std::vector<cv::Rect> OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
     if (_frames.size() != _capacity)
     {
@@ -34,7 +52,7 @@ std::vector<cv::Rect> OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
 
     for (const auto& rect : rectangles)
     {
-        cv::rectangle(cur_frame, rect, Constants::color_map[RED], Constants::Thickness::MEDIUM, cv::LINE_8);
+        cv::rectangle(cur_frame, rect, Constants::color_map.at(RED), Constants::Thickness::MEDIUM, cv::LINE_8);
     }
 
     return rectangles;
@@ -155,21 +173,3 @@ void OpenCVDetection::findPermanentRectangles(std::vector<cv::Rect> &rectangles)
     }
 
 }
-
-OpenCVDetection::OpenCVDetection(cv::Size params,
-                                 int threshold,
-                                 cv::Size dilate_kernel_size,
-                                 size_t _frames,
-                                 cv::Size blur_kernel_size,
-                                 int max_deviation,
-                                 int patience,
-                                 int max_elapsed_time)
-                                : _params(std::move(params)),
-                                  _threshold_value(threshold),
-                                  _dilate_kernel_size(std::move(dilate_kernel_size)),
-                                  _blur_kernel_size(std::move(blur_kernel_size)),
-                                  _sum_frames(cv::Mat::zeros(_params, CV_8UC3)),
-                                  _capacity(_frames),
-                                  _max_deviation(max_deviation),
-                                  _max_elapsed_time(max_elapsed_time),
-                                  _patience(patience) {}

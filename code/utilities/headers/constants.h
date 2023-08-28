@@ -1,7 +1,7 @@
 #ifndef VIDEO_ANALYTICS_DETECTORS_CONSTANTS_H
 #define VIDEO_ANALYTICS_DETECTORS_CONSTANTS_H
 
-#include <protected_map.h>
+#include <map>
 
 #include <opencv4/opencv2/opencv.hpp>
 
@@ -22,7 +22,7 @@ namespace Constants
         THICK = 8
     };
 
-    static ProtectedMap<Color, cv::Scalar> color_map =
+    static const std::map<Color, cv::Scalar> color_map =
     {
             {RED, cv::Scalar(0, 0, 255)},
             {GREEN, cv::Scalar(0, 255, 0)},

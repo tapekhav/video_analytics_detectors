@@ -10,8 +10,8 @@ void ObjectTracking::OneRectangleTrajectory(cv::Mat& frame, size_t id, const cv:
 
     auto last_point = Geometry::findCenter(rectangle);
 
-    cv::line(frame, _history[id].front(), last_point, Constants::color_map[TURQUOISE], Constants::Thickness::THICK,
-                                                                                       cv::LineTypes::LINE_8);
+    cv::line(frame, _history[id].front(), last_point, Constants::color_map.at(TURQUOISE), Constants::Thickness::THICK,
+                                                                                          cv::LineTypes::LINE_8);
 
     _history[id].push(last_point);
     if (_history[id].size() >= _memory)
