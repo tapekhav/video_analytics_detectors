@@ -10,8 +10,6 @@ std::vector<cv::Rect> OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
 
     std::vector<std::vector<cv::Point>> contours = findContours(cur_frame);
 
-    cv::Scalar red_color(0, 0, 255);
-
     double background_area_threshold = 0.05 * _params.height * _params.width;
     double background_min_area = 1e-4 * _params.height * _params.width;
 
@@ -36,7 +34,7 @@ std::vector<cv::Rect> OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
 
     for (const auto& rect : rectangles)
     {
-        cv::rectangle(cur_frame, rect, red_color, Constants::Thickness::MEDIUM, cv::LINE_8);
+        cv::rectangle(cur_frame, rect, Constants::color_map[RED], Constants::Thickness::MEDIUM, cv::LINE_8);
     }
 
     return rectangles;

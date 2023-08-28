@@ -5,13 +5,8 @@
 #include <utility>
 #include <cmath>
 
-#include <opencv4/opencv2/opencv.hpp>
-
 #include <geometry.h>
-
-static const int k_max_deviation = 5;
-static const int k_patience = 2;
-static const int k_max_elapsed_time = 5;
+#include <constants.h>
 
 class OpenCVDetection
 {
@@ -21,9 +16,9 @@ public:
                              cv::Size dilate_kernel_size = {3, 3},
                              size_t _frames = Constants::Memory::MOTION_DETECTION_MEMORY,
                              cv::Size blur_kernel_size = {15, 15},
-                             int max_deviation = k_max_deviation,
-                             int patience = k_patience,
-                             int max_elapsed_time = k_max_elapsed_time);
+                             int max_deviation = Constants::ExtendedRectangle::k_max_deviation,
+                             int patience = Constants::ExtendedRectangle::k_patience,
+                             int max_elapsed_time = Constants::ExtendedRectangle::k_max_elapsed_time);
 
     std::vector<cv::Rect> detectMotion(cv::Mat& cur_frame);
 

@@ -2,8 +2,7 @@
 #define VIDEO_ANALYTICS_DETECTORS_OBJECT_TRACKING_H
 
 #include <geometry.h>
-
-#include <opencv4/opencv2/opencv.hpp>
+#include <constants.h>
 
 using rectangle_points = std::vector<std::queue<cv::Point>>;
 
