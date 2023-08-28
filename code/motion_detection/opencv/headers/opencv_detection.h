@@ -18,7 +18,7 @@ public:
                              size_t _frames = Constants::Memory::MOTION_DETECTION_MEMORY,
                              cv::Size blur_kernel_size = {15, 15});
 
-    void detectMotion(cv::Mat& cur_frame);
+    std::vector<cv::Rect> detectMotion(cv::Mat& cur_frame);
 private:
     std::vector<std::vector<cv::Point>> findContours(const cv::Mat& cur_frame);
 

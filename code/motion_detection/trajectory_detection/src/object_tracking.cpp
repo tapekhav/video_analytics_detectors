@@ -1,7 +1,13 @@
 #include <object_tracking.h>
 
-void ObjectTracking::OneRectangleTrajectory(size_t id, const cv::Rect& rectangle, cv::Mat& frame)
+void ObjectTracking::OneRectangleTrajectory(cv::Mat& frame, size_t id, const cv::Rect& rectangle)
 {
+    if (_history.empty())
+    {
+        auto first_point = Geometry::findCenter(rectangle);
+        _history[id].push(first_point);
+    }
+
     auto last_point = Geometry::findCenter(rectangle);
 
     cv::Scalar turquoise_color(255, 255, 0);
@@ -11,5 +17,12 @@ void ObjectTracking::OneRectangleTrajectory(size_t id, const cv::Rect& rectangle
     if (_history[id].size() >= _memory)
     {
         _history[id].pop();
+    }
+}
+
+void ObjectTracking::writeTrajectory(cv::Mat &frame, const std::vector<cv::Rect>& rectangles)
+{
+    for (const auto& frame_points : _history)
+    {
     }
 }

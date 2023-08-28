@@ -1,11 +1,11 @@
 #include <opencv_detection.h>
 
 
-void OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
+std::vector<cv::Rect> OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
     if (_frames.size() != _capacity)
     {
         addFrames(cur_frame);
-        return;
+        return {};
     }
 
     std::vector<std::vector<cv::Point>> contours = findContours(cur_frame);
@@ -38,6 +38,8 @@ void OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
     {
         cv::rectangle(cur_frame, rect, red_color, Constants::Thickness::MEDIUM, cv::LINE_8);
     }
+
+    return rectangles;
 }
 
 cv::Mat OpenCVDetection::getAbsDiff(const cv::Mat &cur_frame) const
