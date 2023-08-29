@@ -33,7 +33,7 @@ namespace Constants
     struct Thresholds
     {
         static const int MAX_THRESHOLDS = 255;
-        static const int THRESHOLD_VALUE = 43;
+        static const int THRESHOLD_VALUE = 35; //43
     };
 
     struct Memory
@@ -44,8 +44,8 @@ namespace Constants
 
     struct ExtendedRectangle
     {
-        static const int k_max_deviation = 5;
-        static const int k_patience = 2;
+        static const int k_max_deviation = 50;
+        static const int k_patience = 1;
         static const int k_max_elapsed_time = 5;
     };
 }

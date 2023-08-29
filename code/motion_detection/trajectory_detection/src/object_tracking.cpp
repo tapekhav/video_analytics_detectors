@@ -23,7 +23,8 @@ void ObjectTracking::OneRectangleTrajectory(cv::Mat& frame, size_t id, const cv:
 //! TODO допилить алгоритм трекинга
 void ObjectTracking::writeTrajectory(cv::Mat &frame, const std::vector<cv::Rect>& rectangles)
 {
-    for (const auto& frame_points : _history)
+    for (size_t id = 0; id < rectangles.size(); ++id)
     {
+        OneRectangleTrajectory(frame, id, rectangles[id]);
     }
 }
