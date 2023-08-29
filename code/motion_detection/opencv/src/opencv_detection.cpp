@@ -18,7 +18,7 @@ OpenCVDetection::OpenCVDetection(cv::Size params,
           _max_deviation(max_deviation),
           _max_elapsed_time(max_elapsed_time),
           _patience(patience),
-          _cnt(0){}
+          _cnt(0) {}
 
 std::vector<cv::Rect> OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
     if (_frames.size() != _capacity)
@@ -106,35 +106,34 @@ void OpenCVDetection::deleteInnerRectangles(std::vector<cv::Rect> &rectangles)
 {
     auto sortByArea = [](const cv::Rect& first, const cv::Rect& second)
     {
-        //! TODO check sign
-        return first.width * first.height > second.height * second.width;
+        return first.width * first.height > second.width * second.height;
     };
 
     std::sort(rectangles.begin(), rectangles.end(), sortByArea);
 
     std::vector<bool> mask(rectangles.size(), false);
+
     for (size_t i = 0; i < rectangles.size() - 1; ++i)
     {
-        if (mask[i])
-        {
-            continue;
-        }
-
         for (size_t j = i + 1; j < rectangles.size(); ++j)
         {
-            mask[j] = geom::isInnerRectangle(rectangles[j], rectangles[i]);
+            if (geom::isInnerRectangle(rectangles[j], rectangles[i]))
+            {
+                mask[j] = true;
+            }
         }
     }
 
+    std::vector<cv::Rect> filteredRectangles;
     for (size_t i = 0; i < rectangles.size(); ++i)
     {
-        if (mask[i])
+        if (!mask[i])
         {
-            rectangles.erase(rectangles.begin() + static_cast<long>(i));
-            mask.erase(mask.begin() + static_cast<long>(i));
-            --i;
+            filteredRectangles.push_back(rectangles[i]);
         }
     }
+
+    rectangles = filteredRectangles;
 }
 
 std::vector<std::vector<cv::Point>> OpenCVDetection::findContours(const cv::Mat &cur_frame)
@@ -178,7 +177,7 @@ void OpenCVDetection::findPermanentRectangles(std::vector<cv::Rect> &rectangles)
             std::tuple<int, int, bool> center_value = {std::get<0>(value), std::get<1>(value), false};
             if (geom::isInnerPoint(geom::findCenter(rectangles[j]), extended_rect))
             {
-                _rectangles[j] = rectangles[i];
+                _rectangles[j] = extended_rect;
                 used_rectangles[i] = true;
 
                 auto [cnt, time, flag] = _rectangles_center[i];

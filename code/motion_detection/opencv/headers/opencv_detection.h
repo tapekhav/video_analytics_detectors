@@ -13,7 +13,7 @@ class OpenCVDetection
 public:
     explicit OpenCVDetection(cv::Size params = {200, 200},
                              int threshold = Constants::Thresholds::THRESHOLD_VALUE,
-                             cv::Size dilate_kernel_size = {3, 3},
+                             cv::Size dilate_kernel_size = {5, 5},
                              size_t _frames = Constants::Memory::MOTION_DETECTION_MEMORY,
                              cv::Size blur_kernel_size = {15, 15},
                              int max_deviation = Constants::ExtendedRectangle::k_max_deviation,
@@ -22,7 +22,7 @@ public:
 
     std::vector<cv::Rect> detectMotion(cv::Mat& cur_frame);
 
-  private:
+private:
     std::vector<std::vector<cv::Point>> findContours(const cv::Mat& cur_frame);
 
     [[nodiscard]] cv::Mat getAbsDiff(const cv::Mat& cur_frame) const;
