@@ -50,6 +50,7 @@ std::vector<cv::Rect> OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
     }
 
     deleteInnerRectangles(rectangles);
+    findPermanentRectangles(rectangles);
 
     for (const auto& rect : rectangles)
     {
@@ -151,7 +152,7 @@ std::vector<std::vector<cv::Point>> OpenCVDetection::findContours(const cv::Mat 
 }
 
 
-std::vector<cv::Rect> OpenCVDetection::findPermanentRectangles(const std::vector<cv::Rect> &rectangles)
+void OpenCVDetection::findPermanentRectangles(std::vector<cv::Rect> &rectangles)
 {
     std::vector<bool> used_rectangles(rectangles.size(), false);
     if (_rectangles.empty())
@@ -161,6 +162,7 @@ std::vector<cv::Rect> OpenCVDetection::findPermanentRectangles(const std::vector
             _rectangles[_cnt] = rectangle;
             _rectangles_center[_cnt++] = {0, 0, true};
         }
+        return;
     }
 
     for (size_t i = 0; i < rectangles.size(); ++i)
@@ -225,5 +227,6 @@ std::vector<cv::Rect> OpenCVDetection::findPermanentRectangles(const std::vector
         }
     }
 
-    return result;
+    rectangles.clear();
+    std::copy(result.begin(), result.end(), rectangles.begin());
 }

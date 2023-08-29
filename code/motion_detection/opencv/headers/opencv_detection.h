@@ -33,7 +33,7 @@ public:
 
     void deleteInnerRectangles(std::vector<cv::Rect>& rectangles);
 
-    std::vector<cv::Rect> findPermanentRectangles(const std::vector<cv::Rect>& rectangles);
+    void findPermanentRectangles(std::vector<cv::Rect>& rectangles);
 
     [[nodiscard]] cv::Mat getMeanSum() const;
 
