@@ -37,7 +37,7 @@ std::vector<cv::Rect> OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
     {
         double area = cv::contourArea(contours[i]);
 
-        if (geom::checkDistContours(contours[i], contours[i + 1]) < background_min_area * 0.1)
+        if (geom::checkDistContours(contours[i], contours[i + 1]) < background_min_area * 0.2)
         {
             geom::mergeContours(contours[i], contours[i + 1]);
         }
@@ -51,7 +51,6 @@ std::vector<cv::Rect> OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
 
     deleteInnerRectangles(rectangles);
     findPermanentRectangles(rectangles);
-
 
 
     for (const auto& rect : rectangles)
