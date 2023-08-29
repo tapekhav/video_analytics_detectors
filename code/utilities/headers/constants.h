@@ -33,7 +33,7 @@ namespace Constants
     struct Thresholds
     {
         static const int MAX_THRESHOLDS = 255;
-        static const int THRESHOLD_VALUE = 51 //43
+        static const int THRESHOLD_VALUE = 51; //43
     };
 
     struct Memory
