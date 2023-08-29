@@ -33,7 +33,7 @@ public:
 
     void deleteInnerRectangles(std::vector<cv::Rect>& rectangles);
 
-    void findPermanentRectangles(std::vector<cv::Rect>& rectangles);
+    std::vector<cv::Rect> findPermanentRectangles(const std::vector<cv::Rect>& rectangles);
 
     [[nodiscard]] cv::Mat getMeanSum() const;
 
@@ -44,7 +44,8 @@ private:
     cv::Size _dilate_kernel_size;
     cv::Size _blur_kernel_size;
 
-    std::vector<cv::Rect> _prev_rectangles;
+    size_t _cnt;
+    std::map<size_t, cv::Rect> _rectangles;
     std::map<size_t, std::tuple<int, int, bool>> _rectangles_center;
 
     const int _max_deviation;

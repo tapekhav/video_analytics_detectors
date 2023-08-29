@@ -17,7 +17,8 @@ OpenCVDetection::OpenCVDetection(cv::Size params,
           _capacity(_frames),
           _max_deviation(max_deviation),
           _max_elapsed_time(max_elapsed_time),
-          _patience(patience) {}
+          _patience(patience),
+          _cnt(0){}
 
 std::vector<cv::Rect> OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
     if (_frames.size() != _capacity)
@@ -150,31 +151,30 @@ std::vector<std::vector<cv::Point>> OpenCVDetection::findContours(const cv::Mat 
 }
 
 
-void OpenCVDetection::findPermanentRectangles(std::vector<cv::Rect> &rectangles)
+std::vector<cv::Rect> OpenCVDetection::findPermanentRectangles(const std::vector<cv::Rect> &rectangles)
 {
     std::vector<bool> used_rectangles(rectangles.size(), false);
-    if (_prev_rectangles.empty())
+    if (_rectangles.empty())
     {
-        for (size_t i = 0; i < rectangles.size(); ++i)
+        for (const auto & rectangle : rectangles)
         {
-            _prev_rectangles.push_back(rectangles[i]);
-            _rectangles_center[i] = {0, 0, true};
+            _rectangles[_cnt] = rectangle;
+            _rectangles_center[_cnt++] = {0, 0, true};
         }
-        return;
     }
 
     for (size_t i = 0; i < rectangles.size(); ++i)
     {
         cv::Rect extended_rect = { rectangles[i].x - _max_deviation, rectangles[i].y - _max_deviation,
                                    rectangles[i].width + 2 * _max_deviation, rectangles[i].height + 2 * _max_deviation };
-        for (size_t j = 0; j < _prev_rectangles.size(); ++j)
+        for (size_t j = 0; j < _rectangles.size(); ++j)
         {
             auto value = _rectangles_center.find(j) == _rectangles_center.end() ? std::tuple<int, int, bool>(0, 0, false)
                                                                                 : _rectangles_center[j];
             std::tuple<int, int, bool> center_value = {std::get<0>(value), std::get<1>(value), false};
             if (geom::isInnerPoint(geom::findCenter(rectangles[j]), extended_rect))
             {
-                _prev_rectangles[j] = rectangles[i];
+                _rectangles[j] = rectangles[i];
                 used_rectangles[j] = true;
 
                 auto [cnt, time, flag] = _rectangles_center[i];
@@ -201,11 +201,29 @@ void OpenCVDetection::findPermanentRectangles(std::vector<cv::Rect> &rectangles)
             }
         }
     }
-    //! TODO end algorithm tomorrow
+
     for (const auto& id : ids)
     {
-        std::remove(_prev_rectangles.begin(), _prev_rectangles.end(), id);
-
+        _rectangles.erase(id);
     }
 
+    for (size_t i = 0; i < rectangles.size(); ++i)
+    {
+        if (used_rectangles[i])
+        {
+            _rectangles[_cnt] = rectangles[i];
+            _rectangles_center[_cnt++] = {0, 0, true};
+        }
+    }
+
+    std::vector<cv::Rect> result;
+    for (size_t i = 0; i < _rectangles.size(); ++i)
+    {
+        if (std::get<1>(_rectangles_center[i]) >= _patience)
+        {
+            result.push_back(_rectangles[i]);
+        }
+    }
+
+    return result;
 }
