@@ -37,9 +37,12 @@ std::vector<cv::Rect> OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
     {
         double area = cv::contourArea(contours[i]);
 
-        if (geom::checkDistContours(contours[i], contours[i + 1]) < background_min_area * 0.2)
+        for (size_t j = i + 1; j < i + 20 && j < contours.size(); ++j)
         {
-            geom::mergeContours(contours[i], contours[i + 1]);
+            if (geom::checkDistContours(contours[i], contours[j]) < 30)
+            {
+                geom::mergeContours(contours[i], contours[j]);
+            }
         }
 
         if (area < background_area_threshold && area > background_min_area)
@@ -160,7 +163,7 @@ void OpenCVDetection::findPermanentRectangles(std::vector<cv::Rect> &rectangles)
         for (const auto &rectangle : rectangles)
         {
             _rectangles[_cnt] = rectangle;
-            _rectangles_center[_cnt++] = {0, 0, true};
+            _rectangles_center[_cnt++] = std::make_tuple(0, 0, true);
         }
         return;
     }
@@ -180,7 +183,7 @@ void OpenCVDetection::findPermanentRectangles(std::vector<cv::Rect> &rectangles)
                 used_rectangles[i] = true;
 
                 auto [cnt, time, flag] = _rectangles_center[i];
-                std::tuple<int, int, bool> rectangle_center = {cnt + 1, 0, true};
+                std::tuple<int, int, bool> rectangle_center = std::make_tuple(cnt + 1, 0, true);
                 _rectangles_center[i] = rectangle_center;
 
                 break;
@@ -214,7 +217,7 @@ void OpenCVDetection::findPermanentRectangles(std::vector<cv::Rect> &rectangles)
         if (used_rectangles[i])
         {
             _rectangles[_cnt] = rectangles[i];
-            _rectangles_center[_cnt++] = {0, 0, true};
+            _rectangles_center[_cnt++] = std::make_tuple(0, 0, true);
         }
     }
 

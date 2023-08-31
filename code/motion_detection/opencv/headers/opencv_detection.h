@@ -15,7 +15,7 @@ public:
                              int threshold = Constants::Thresholds::THRESHOLD_VALUE,
                              cv::Size dilate_kernel_size = {5, 5},
                              size_t _frames = Constants::Memory::MOTION_DETECTION_MEMORY,
-                             cv::Size blur_kernel_size = {15, 15},
+                             cv::Size blur_kernel_size = {9, 9},
                              int max_deviation = Constants::ExtendedRectangle::k_max_deviation,
                              int patience = Constants::ExtendedRectangle::k_patience,
                              int max_elapsed_time = Constants::ExtendedRectangle::k_max_elapsed_time);
