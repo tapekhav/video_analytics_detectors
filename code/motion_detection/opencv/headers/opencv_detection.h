@@ -20,7 +20,7 @@ public:
                              int patience = Constants::ExtendedRectangle::k_patience,
                              int max_elapsed_time = Constants::ExtendedRectangle::k_max_elapsed_time);
 
-    std::vector<cv::Rect> detectMotion(cv::Mat& cur_frame);
+    std::map<size_t, cv::Rect> detectMotion(cv::Mat& cur_frame);
 
 private:
     std::vector<std::vector<cv::Point>> findContours(const cv::Mat& cur_frame);

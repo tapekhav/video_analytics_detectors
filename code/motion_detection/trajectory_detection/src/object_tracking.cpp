@@ -1,30 +1,25 @@
 #include <object_tracking.h>
 
-void ObjectTracking::OneRectangleTrajectory(cv::Mat& frame, size_t id, const cv::Rect& rectangle)
+void ObjectTracking::oneRectangleTrajectory(cv::Mat& frame, size_t id, const cv::Rect& rectangle)
 {
-    if (_history.empty())
+    for (size_t i = 0; i < _history[id].size() - 1; ++i)
     {
-        auto first_point = geom::findCenter(rectangle);
-        _history[id].push(first_point);
+        cv::line(frame, _history[id][i], _history[id][i + 1], Constants::color_map.at(Color::TURQUOISE),
+                                                              Constants::Thickness::THICK);
+
     }
-
-    auto last_point = geom::findCenter(rectangle);
-
-    cv::line(frame, _history[id].front(), last_point, Constants::color_map.at(TURQUOISE), Constants::Thickness::THICK,
-                                                                                          cv::LineTypes::LINE_8);
-
-    _history[id].push(last_point);
-    if (_history[id].size() >= _memory)
-    {
-        _history[id].pop();
-    }
+    _history[id].push_back(geom::findCenter(rectangle));
 }
 
-//! TODO допилить алгоритм трекинга
-void ObjectTracking::writeTrajectory(cv::Mat &frame, const std::vector<cv::Rect>& rectangles)
+void ObjectTracking::writeTrajectory(cv::Mat &frame, const std::map<size_t, cv::Rect>& rectangles)
 {
-    for (size_t id = 0; id < rectangles.size(); ++id)
+    for (const auto& rect : rectangles)
     {
-        OneRectangleTrajectory(frame, id, rectangles[id]);
+        _history[rect.first].push_back(geom::findCenter(rect.second));
+    }
+
+    for (const auto& rect : rectangles)
+    {
+        oneRectangleTrajectory(frame, rect.first, rect.second);
     }
 }
