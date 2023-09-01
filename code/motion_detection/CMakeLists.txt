@@ -1,3 +1,3 @@
-add_subdirectory(opencv)
-add_subdirectory(no_opencv)
+add_subdirectory(object_search/no_opencv)
+add_subdirectory(object_search/opencv)
 add_subdirectory(trajectory_detection)

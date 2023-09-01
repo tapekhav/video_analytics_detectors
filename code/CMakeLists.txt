@@ -26,7 +26,9 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 include_directories(video_capture/headers)
 include_directories(video_writer/headers)
-include_directories(motion_detection/opencv/headers)
+include_directories(motion_detection/object_search/opencv/headers)
+include_directories(motion_detection/object_search/no_opencv/headers)
+include_directories(motion_detection/object_search/header)
 include_directories(utilities/headers)
 include_directories(motion_detection/trajectory_detection/headers)
 

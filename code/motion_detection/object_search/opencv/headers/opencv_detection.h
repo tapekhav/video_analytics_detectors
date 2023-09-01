@@ -8,6 +8,7 @@
 #include <geometry.h>
 #include <constants.h>
 
+
 class OpenCVDetection
 {
 public:
