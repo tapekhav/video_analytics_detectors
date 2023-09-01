@@ -55,7 +55,6 @@ std::vector<cv::Rect> OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
     deleteInnerRectangles(rectangles);
     findPermanentRectangles(rectangles);
 
-
     for (const auto& rect : rectangles)
     {
         cv::rectangle(cur_frame, rect, Constants::color_map.at(RED), Constants::Thickness::MEDIUM, cv::LINE_8);
