@@ -11,7 +11,7 @@
 class OpenCVDetection
 {
 public:
-    explicit OpenCVDetection(cv::Size params = {200, 200},
+    explicit OpenCVDetection(cv::Size params,
                              int threshold = Constants::Thresholds::THRESHOLD_VALUE,
                              cv::Size dilate_kernel_size = {5, 5},
                              size_t _frames = Constants::Memory::MOTION_DETECTION_MEMORY,
@@ -20,7 +20,7 @@ public:
                              int patience = Constants::ExtendedRectangle::k_patience,
                              int max_elapsed_time = Constants::ExtendedRectangle::k_max_elapsed_time);
 
-    std::vector<cv::Rect> detectMotion(cv::Mat& cur_frame);
+    std::map<size_t, cv::Rect> detectMotion(cv::Mat& cur_frame);
 
 private:
     std::vector<std::vector<cv::Point>> findContours(const cv::Mat& cur_frame);

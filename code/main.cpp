@@ -1,5 +1,6 @@
 #include <video_capture.h>
 #include <video_writing.h>
+#include <object_tracking.h>
 #include <opencv_detection.h>
 
 int main()
@@ -14,10 +15,11 @@ int main()
     output += "output.avi";
 
     OpenCVDetection aaaa({zxc.getFrameWidth(), zxc.getFrameHeight()});
-
+    ObjectTracking z;
     for (auto & frame : zv)
     {
-        aaaa.detectMotion(frame);
+        auto arr = aaaa.detectMotion(frame);
+        z.writeTrajectory(frame, arr);
     }
 
     VideoWriter abc(output, zxc.getFrameWidth(), zxc.getFrameHeight(), zxc.getFPS());

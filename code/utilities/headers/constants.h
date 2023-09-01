@@ -44,7 +44,7 @@ namespace Constants
 
     struct ExtendedRectangle
     {
-        static const int k_max_deviation = 25;
+        static const int k_max_deviation = 30;
         static const int k_patience = 8;
         static const int k_max_elapsed_time = 3;
     };

@@ -20,7 +20,7 @@ OpenCVDetection::OpenCVDetection(cv::Size params,
           _patience(patience),
           _cnt(0) {}
 
-std::vector<cv::Rect> OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
+std::map<size_t, cv::Rect> OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
     if (_frames.size() != _capacity)
     {
         addFrames(cur_frame);
@@ -55,13 +55,21 @@ std::vector<cv::Rect> OpenCVDetection::detectMotion(cv::Mat& cur_frame) {
     deleteInnerRectangles(rectangles);
     findPermanentRectangles(rectangles);
 
-
     for (const auto& rect : rectangles)
     {
         cv::rectangle(cur_frame, rect, Constants::color_map.at(RED), Constants::Thickness::MEDIUM, cv::LINE_8);
     }
 
-    return rectangles;
+    std::map<size_t, cv::Rect> result;
+    for (size_t i = 0; i < rectangles.size(); ++i)
+    {
+        if (std::get<0>(_rectangles_center[i]) >= _patience)
+        {
+            result[i] = _rectangles[i];
+        }
+    }
+
+    return result;
 }
 
 cv::Mat OpenCVDetection::getAbsDiff(const cv::Mat &cur_frame) const
@@ -126,16 +134,16 @@ void OpenCVDetection::deleteInnerRectangles(std::vector<cv::Rect> &rectangles)
         }
     }
 
-    std::vector<cv::Rect> filteredRectangles;
+    std::vector<cv::Rect> filtered_rectangles;
     for (size_t i = 0; i < rectangles.size(); ++i)
     {
         if (!mask[i])
         {
-            filteredRectangles.push_back(rectangles[i]);
+            filtered_rectangles.push_back(rectangles[i]);
         }
     }
 
-    rectangles = filteredRectangles;
+    rectangles = filtered_rectangles;
 }
 
 std::vector<std::vector<cv::Point>> OpenCVDetection::findContours(const cv::Mat &cur_frame)

@@ -16,7 +16,7 @@ namespace geom
 
     double calculateDistance(const cv::Point &p1, const cv::Point &p2);
 
-    inline cv::Point findCenter(const cv::Rect& rect) { return {rect.x + rect.width / 2, rect.y + rect.height}; }
+    inline cv::Point findCenter(const cv::Rect& rect) { return {rect.x + rect.width / 2, rect.y + rect.height / 2}; }
 }
 
 #endif //VIDEO_ANALYTICS_DETECTORS_GEOMETRY_H
