@@ -10,6 +10,8 @@ void VideoWriter::writeVideo(const std::vector<cv::Mat>& frames)
 {
     for(const auto& frame : frames)
     {
+        // cv::imshow("Frame", frame);
+        // cv::waitKey();
         _writer.write(frame);
     }
 }

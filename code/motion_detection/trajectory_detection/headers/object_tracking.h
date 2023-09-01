@@ -21,6 +21,8 @@ private:
 private:
     rectangle_points _history;
     const size_t _memory;
+
+    std::map<size_t, size_t> _frame_counter;
 };
 
 #endif //VIDEO_ANALYTICS_DETECTORS_OBJECT_TRACKING_H

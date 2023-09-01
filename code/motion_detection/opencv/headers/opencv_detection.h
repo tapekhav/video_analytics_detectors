@@ -11,7 +11,7 @@
 class OpenCVDetection
 {
 public:
-    explicit OpenCVDetection(cv::Size params = {200, 200},
+    explicit OpenCVDetection(cv::Size params,
                              int threshold = Constants::Thresholds::THRESHOLD_VALUE,
                              cv::Size dilate_kernel_size = {5, 5},
                              size_t _frames = Constants::Memory::MOTION_DETECTION_MEMORY,
