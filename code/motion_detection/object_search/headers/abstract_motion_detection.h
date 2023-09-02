@@ -12,10 +12,36 @@
 class AbstractMotionDetection
 {
 public:
+    std::map<size_t, cv::Rect> detectMotion(cv::Mat& cur_frame);
 
+    virtual ~AbstractMotionDetection() = default;
 protected:
-    // void deleteInnerRectangles(std::vector<cv::Rect> &rectangles);
+    AbstractMotionDetection(cv::Size params,
+                            int threshold,
+                            cv::Size dilate_kernel_size,
+                            size_t _frames,
+                            cv::Size blur_kernel_size,
+                            int max_deviation,
+                            int patience,
+                            int max_elapsed_time);
 
+    void deleteInnerRectangles(std::vector<cv::Rect> &rectangles);
+
+    void findPermanentRectangles(std::vector<cv::Rect> &rectangles);
+
+    void addFrames(const cv::Mat& cur_frame);
+
+    void changeSum(const cv::Mat &cur_frame);
+
+    [[nodiscard]] cv::Mat getMeanSum() const;
+
+    virtual void gaussianFilter(const cv::Mat& in_frame, cv::Mat& out_frame) = 0;
+
+    virtual std::vector<std::vector<cv::Point>> findContours(const cv::Mat &cur_frame) = 0;
+
+    virtual double findArea(const std::vector<cv::Point>& contour) = 0;
+
+    virtual cv::Rect boundContour(const std::vector<cv::Point>& contour) = 0;
 protected:
     cv::Size _params;
     int _threshold_value;

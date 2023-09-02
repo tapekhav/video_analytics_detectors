@@ -34,7 +34,7 @@ add_executable(video_analytics_detectors
                main.cpp
                video_capture/headers/video_capture.h)
 
-target_link_libraries(video_analytics_detectors VideoWriter Utility Trajectory ObjectSearch ${OpenCV_LIBS})
+target_link_libraries(video_analytics_detectors ObjectSearch VideoWriter Utility Trajectory ${OpenCV_LIBS})
 
 add_compile_definitions(VIDEOS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../assets/videos/")
 add_compile_definitions(OUTPUT_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../assets/output/")
