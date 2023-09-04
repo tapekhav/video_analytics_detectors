@@ -63,51 +63,51 @@ void AbstractMotionDetection::findPermanentRectangles(std::vector<cv::Rect> &rec
             _rectangles[_cnt] = rectangle;
             _rectangles_center[_cnt++] = std::make_tuple(0, 0, true);
         }
-        return;
     }
-
-    for (size_t i = 0; i < rectangles.size(); ++i)
-    {
-        cv::Rect extended_rect = { rectangles[i].x - _max_deviation, rectangles[i].y - _max_deviation,
-                                   rectangles[i].width + 2 * _max_deviation, rectangles[i].height + 2 * _max_deviation };
-        for (size_t j = 0; j < _rectangles.size(); ++j)
+    else {
+        for (size_t i = 0; i < rectangles.size(); ++i)
         {
-            auto value = _rectangles_center.find(j) == _rectangles_center.end() ? std::tuple<int, int, bool>(0, 0, false)
-                                                                                : _rectangles_center[j];
-            std::tuple<int, int, bool> center_value = {std::get<0>(value), std::get<1>(value), false};
-            if (geom::isInnerPoint(geom::findCenter(rectangles[j]), extended_rect))
+            cv::Rect extended_rect = {rectangles[i].x - _max_deviation, rectangles[i].y - _max_deviation,
+                                      rectangles[i].width + 2 * _max_deviation,
+                                      rectangles[i].height + 2 * _max_deviation};
+            for (auto &rect: _rectangles)
             {
-                _rectangles[j] = extended_rect;
-                used_rectangles[i] = true;
+                auto value = _rectangles_center.find(rect.first) == _rectangles_center.end() ?
+                             std::tuple<int, int, bool>(0, 0, false) : _rectangles_center[rect.first];
+                std::tuple<int, int, bool> center_value = {std::get<0>(value), std::get<1>(value), false};
+                if (geom::isInnerPoint(geom::findCenter(rectangles[rect.first]), extended_rect)) {
+                    _rectangles[rect.first] = extended_rect;
+                    used_rectangles[i] = true;
 
-                auto [cnt, time, flag] = _rectangles_center[i];
-                std::tuple<int, int, bool> rectangle_center = std::make_tuple(cnt + 1, 0, true);
-                _rectangles_center[i] = rectangle_center;
+                    auto [cnt, time, flag] = _rectangles_center[i];
+                    std::tuple<int, int, bool> rectangle_center = std::make_tuple(cnt + 1, 0, true);
+                    _rectangles_center[i] = rectangle_center;
 
-                break;
+                    break;
+                }
             }
         }
-    }
 
-    std::vector<size_t> ids;
-    for (auto& rect_center : _rectangles_center)
-    {
-        auto [cnt, time, is_in_frame] = rect_center.second;
-        if (is_in_frame)
+        std::vector<size_t> ids;
+        for (auto &rect_center: _rectangles_center)
         {
-            ++time;
-            rect_center.second = {cnt, time, is_in_frame};
-
-            if (time >= _max_elapsed_time)
+            auto [cnt, time, is_in_frame] = rect_center.second;
+            if (is_in_frame)
             {
-                ids.push_back(rect_center.first);
+                ++time;
+                rect_center.second = {cnt, time, is_in_frame};
+
+                if (time >= _max_elapsed_time)
+                {
+                    ids.push_back(rect_center.first);
+                }
             }
         }
-    }
 
-    for (const auto& id : ids)
-    {
-        _rectangles.erase(id);
+        for (const auto &id: ids)
+        {
+            _rectangles.erase(id);
+        }
     }
 
     for (size_t i = 0; i < rectangles.size(); ++i)
