@@ -21,10 +21,17 @@ void ObjectTracking::writeTrajectory(cv::Mat &frame, const std::map<size_t, cv::
     {
         size_t id = kv.first;
         auto& positions = kv.second;
+        /*std::sort(positions.begin(), positions.end(), [](const cv::Point& first, const cv::Point& second)
+        {
+            return first.y < second.y;
+        }); */
         for (size_t i = 0; i < positions.size() - 1; ++i)
         {
-            //cv::line(frame, positions[i], positions[i + 1], Constants::color_map.at(Color::TURQUOISE),
-              //                                              Constants::Thickness::THICK);
+            //if (std::abs(positions[i].y - positions[i + 1].y) < 100)
+            //{
+              //  cv::line(frame, positions[i], positions[i + 1], Constants::color_map.at(Color::TURQUOISE),
+                //         Constants::Thickness::THICK);
+            //}
             cv::circle(frame, positions[i], Constants::Thickness::THICK, Constants::color_map.at(Color::TURQUOISE),
                        cv::FILLED);
         }
@@ -44,10 +51,5 @@ void ObjectTracking::writeTrajectory(cv::Mat &frame, const std::map<size_t, cv::
     {
         _history.erase(id);
         _frame_counter.erase(id);
-    }
-
-    for (const auto& h : _history)
-    {
-        std::cout << h.first << " - " << h.second << "\n";
     }
 }
