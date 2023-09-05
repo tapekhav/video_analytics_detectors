@@ -16,14 +16,14 @@ cv::Mat GaussianBlur::gaussianKernel() const
     return kernel / sum;
 }
 
-void GaussianBlur::gaussianBlur(cv::Mat &frame)
+void GaussianBlur::gaussianBlur(const cv::Mat& in_frame, cv::Mat &frame)
 {
     cv::Mat kernel = gaussianKernel();
-    cv::Mat temp_image = frame.clone();
+    cv::Mat temp_image = in_frame.clone();
 
     int pad = _kernel_size / 2;
-    int width = frame.cols;
-    int height = frame.rows;
+    int width = in_frame.cols;
+    int height = in_frame.rows;
 
     for (int y = 0; y < height; ++y)
     {
@@ -52,7 +52,7 @@ void GaussianBlur::gaussianBlur(cv::Mat &frame)
                 int idx = y + k;
                 if (idx >= 0 && idx < height)
                 {
-                    sum += frame.at<uchar>(idx, x) * kernel.at<double>(k + pad, 0);
+                    sum += in_frame.at<uchar>(idx, x) * kernel.at<double>(k + pad, 0);
                 }
             }
             frame.at<uchar>(y, x) = static_cast<uchar>(sum);

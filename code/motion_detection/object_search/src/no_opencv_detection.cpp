@@ -7,7 +7,8 @@ NoOpenCVDetection::NoOpenCVDetection(cv::Size params,
                                      cv::Size blur_kernel_size,
                                      int max_deviation,
                                      int patience,
-                                     int max_elapsed_time)
+                                     int max_elapsed_time,
+                                     double my_kernel_size)
                                      : AbstractMotionDetection(std::move(params),
                                                                threshold, 
                                                                std::move(dilate_kernel_size),
@@ -15,6 +16,55 @@ NoOpenCVDetection::NoOpenCVDetection(cv::Size params,
                                                                std::move(blur_kernel_size),
                                                                max_deviation,
                                                                patience,
-                                                               max_elapsed_time) {}
+                                                               max_elapsed_time), 
+                                                               _blur(my_kernel_size, 1.0) {}
 
+
+cv::Mat NoOpenCVDetection::getAbsDiff(const cv::Mat &cur_frame) const
+{
+    cv::Mat diff, sum;
+    sum = getMeanSum();
+    cv::absdiff(cur_frame, sum, diff);
+
+    cv::cvtColor(diff, diff, cv::COLOR_BGR2GRAY);
+
+    return diff;
+}
+
+std::vector<std::vector<cv::Point>> NoOpenCVDetection::findContours(const cv::Mat &cur_frame)
+{
+    cv::Mat diff = getAbsDiff(cur_frame);
+    changeSum(cur_frame);
+
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, _dilate_kernel_size);
+    cv::dilate(diff, diff, kernel);
+
+    cv::threshold(diff, diff, _threshold_value, Constants::Thresholds::MAX_THRESHOLDS, cv::THRESH_BINARY);
+
+    std::vector<std::vector<cv::Point>> contours;
+    cv::findContours(diff, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+
+    return contours;
+}
+
+void NoOpenCVDetection::contouring(const cv::Mat& frame, cv::Point prev, cv::Point cur, std::vector<cv::Point>& contour)
+{
+    if (std::abs(frame.at<uchar>(prev.x, prev.y) - frame.at<uchar>(cur.x, cur.y)) < _threshold_value)
+    {}
+}
+
+void NoOpenCVDetection::gaussianFilter(const cv::Mat &in_frame, cv::Mat &out_frame)
+{
+    _blur.gaussianBlur(in_frame, out_frame);
+}
+
+double NoOpenCVDetection::findArea(const std::vector<cv::Point> &contour)
+{
+    return cv::contourArea(contour);
+}
+
+cv::Rect NoOpenCVDetection::boundContour(const std::vector<cv::Point> &contour)
+{
+    return cv::boundingRect(contour);
+}
 
