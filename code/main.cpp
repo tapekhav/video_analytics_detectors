@@ -20,7 +20,7 @@ int main()
     for (auto & frame : zv)
     {
         auto arr = aaaa->detectMotion(frame);
-        z.writeTrajectory(frame, arr);
+        // z.writeTrajectory(frame, arr);
     }
 
     VideoWriter abc(output, zxc.getFrameWidth(), zxc.getFrameHeight(), zxc.getFPS());
