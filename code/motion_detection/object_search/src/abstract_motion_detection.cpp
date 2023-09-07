@@ -134,8 +134,7 @@ void AbstractMotionDetection::findPermanentRectangles(std::vector<cv::Rect> &rec
 
 void AbstractMotionDetection::addFrames(const cv::Mat& cur_frame)
 {
-    cv::Mat frame;
-    gaussianFilter(cur_frame, frame);
+    auto frame = gaussianFilter(cur_frame);
 
     _sum_frames += frame;
     _frames.push_back(frame);
@@ -199,7 +198,7 @@ std::map<size_t, cv::Rect> AbstractMotionDetection::detectMotion(cv::Mat &cur_fr
 
     for (const auto& rect : rectangles)
     {
-        cv::rectangle(cur_frame, rect, Constants::color_map.at(RED), Constants::Thickness::MEDIUM, cv::LINE_8);
+        cv::rectangle(cur_frame, rect, consts::color_map.at(RED), consts::thickness::MEDIUM, cv::LINE_8);
     }
 
     std::map<size_t, cv::Rect> result;

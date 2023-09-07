@@ -11,9 +11,9 @@ class GaussianBlur
 public:
     GaussianBlur(int k_size, double sigma) : _kernel_size(k_size), _sigma(sigma) { assert(_kernel_size % 2 == 1); }
 
-    void gaussianBlur(const cv::Mat& in_frame, cv::Mat& frame);
+    cv::Mat gaussianBlur(const cv::Mat& in_frame);
 private:
-    [[nodiscard]] cv::Mat gaussianKernel() const;
+    [[nodiscard]] std::vector<std::vector<double>> gaussianKernel() const;
 
 private:
     int _kernel_size;

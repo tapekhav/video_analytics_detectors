@@ -13,9 +13,9 @@ enum Color
     TURQUOISE
 };
 
-namespace Constants
+namespace consts
 {
-    enum Thickness
+    enum thickness
     {
         THIN = 1,
         MEDIUM = 4,
@@ -30,24 +30,30 @@ namespace Constants
             {TURQUOISE, cv::Scalar(255, 255, 0)}
     };
 
-    struct Thresholds
+    namespace thresholds
     {
-        static const int MAX_THRESHOLDS = 255;
-        static const int THRESHOLD_VALUE = 50;
+        const int MAX_THRESHOLDS = 255;
+        const int THRESHOLD_VALUE = 50;
     };
 
-    struct Memory
+    namespace mem
     {
-        static const size_t TRAJECTORY_MEMORY = 30;
-        static const size_t MOTION_DETECTION_MEMORY = 15;
+        const size_t TRAJECTORY_MEMORY = 30;
+        const size_t MOTION_DETECTION_MEMORY = 15;
     };
 
-    struct ExtendedRectangle
+    namespace ext_rect
     {
-        static const int k_max_deviation = 30;
-        static const int k_patience = 8;
-        static const int k_max_elapsed_time = 3;
+        const int k_max_deviation = 30;
+        const int k_patience = 8;
+        const int k_max_elapsed_time = 3;
     };
+
+    namespace moore
+    {
+        const int dx[] = {0, 0, 1, 1, 1, -1, -1, -1};
+        const int dy[] = {1, -1, 0, -1, 1, 0, 1, -1};
+    }
 }
 
 #endif //VIDEO_ANALYTICS_DETECTORS_CONSTANTS_H

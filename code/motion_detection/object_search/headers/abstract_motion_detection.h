@@ -35,7 +35,7 @@ protected:
 
     [[nodiscard]] cv::Mat getMeanSum() const;
 
-    virtual void gaussianFilter(const cv::Mat& in_frame, cv::Mat& out_frame) = 0;
+    virtual cv::Mat gaussianFilter(const cv::Mat& in_frame) = 0;
 
     virtual std::vector<std::vector<cv::Point>> findContours(const cv::Mat &cur_frame) = 0;
 

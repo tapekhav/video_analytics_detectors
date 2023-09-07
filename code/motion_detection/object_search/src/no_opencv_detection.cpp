@@ -1,4 +1,5 @@
 #include <no_opencv_detection.h>
+#include <cast_to_grey.h>
 
 NoOpenCVDetection::NoOpenCVDetection(cv::Size params,
                                      int threshold,
@@ -8,16 +9,22 @@ NoOpenCVDetection::NoOpenCVDetection(cv::Size params,
                                      int max_deviation,
                                      int patience,
                                      int max_elapsed_time,
-                                     double my_kernel_size)
+                                     int my_kernel_size)
                                      : AbstractMotionDetection(std::move(params),
-                                                               threshold, 
+                                                               threshold,
                                                                std::move(dilate_kernel_size),
                                                                frames,
                                                                std::move(blur_kernel_size),
                                                                max_deviation,
                                                                patience,
-                                                               max_elapsed_time), 
-                                                               _blur(my_kernel_size, 1.0) {}
+                                                               max_elapsed_time),
+                                                               _blur(9, 3.0)
+                                                               {
+                                                                    for (size_t i = 0; i < _params.height; ++i)
+                                                                    {
+                                                                        _visited.emplace_back(_params.width, false);
+                                                                    }
+                                                               }
 
 
 cv::Mat NoOpenCVDetection::getAbsDiff(const cv::Mat &cur_frame) const
@@ -25,8 +32,6 @@ cv::Mat NoOpenCVDetection::getAbsDiff(const cv::Mat &cur_frame) const
     cv::Mat diff, sum;
     sum = getMeanSum();
     cv::absdiff(cur_frame, sum, diff);
-
-    cv::cvtColor(diff, diff, cv::COLOR_BGR2GRAY);
 
     return diff;
 }
@@ -39,23 +44,65 @@ std::vector<std::vector<cv::Point>> NoOpenCVDetection::findContours(const cv::Ma
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, _dilate_kernel_size);
     cv::dilate(diff, diff, kernel);
 
-    cv::threshold(diff, diff, _threshold_value, Constants::Thresholds::MAX_THRESHOLDS, cv::THRESH_BINARY);
+    cv::threshold(diff, diff, _threshold_value, consts::thresholds::MAX_THRESHOLDS, cv::THRESH_BINARY);
 
     std::vector<std::vector<cv::Point>> contours;
+    // findContours(diff, contours);
     cv::findContours(diff, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
     return contours;
 }
 
-void NoOpenCVDetection::contouring(const cv::Mat& frame, cv::Point prev, cv::Point cur, std::vector<cv::Point>& contour)
+void NoOpenCVDetection::findContours(const cv::Mat &frame, std::vector<std::vector<cv::Point>>& contours)
 {
-    if (std::abs(frame.at<uchar>(prev.x, prev.y) - frame.at<uchar>(cur.x, cur.y)) < _threshold_value)
-    {}
+    for (int i = 0; i < _params.height; i += 10)
+    {
+        for (int j = 0; j < _params.width; j += 10)
+        {
+            if (!_visited[i][j])
+            {
+                std::vector<cv::Point> contour = {cv::Point(0.0, 1.0)};
+                cv::Point point(j, i);
+                traceContour(frame, point, contour);
+                contours.push_back(contour);
+            }
+        }
+    }
 }
 
-void NoOpenCVDetection::gaussianFilter(const cv::Mat &in_frame, cv::Mat &out_frame)
+void NoOpenCVDetection::traceContour(const cv::Mat& frame, const cv::Point& point, std::vector<cv::Point>& contour)
 {
-    _blur.gaussianBlur(in_frame, out_frame);
+    if (point.y >= _params.height || point.x >= _params.width)
+    {
+        return;
+    }
+
+    if (frame.at<uchar>(point.x, point.y) > _threshold_value || _visited[point.y][point.x])
+    {
+        return;
+    }
+    _visited[point.y][point.x] = true;
+    contour.push_back(point);
+
+    for (size_t i = 0; i < 8; ++i)
+    {
+        traceContour(frame, cv::Point(point.x + consts::moore::dx[i], point.y + consts::moore::dy[i]), contour);
+    }
+}
+
+cv::Mat NoOpenCVDetection::gaussianFilter(const cv::Mat &in_frame)
+{
+    auto out_frame = grey::castToGrey(_blur.gaussianBlur(in_frame));
+
+    cv::Mat zxc = in_frame.clone();
+    cv::GaussianBlur(in_frame, zxc, _blur_kernel_size, 0, 0);
+    cv::cvtColor(zxc, zxc, cv::COLOR_BGR2GRAY);
+
+    cv::imshow("Frame", out_frame);
+    cv::imshow("zxc", zxc);
+    cv::waitKey();
+
+    return out_frame;
 }
 
 double NoOpenCVDetection::findArea(const std::vector<cv::Point> &contour)
@@ -67,4 +114,3 @@ cv::Rect NoOpenCVDetection::boundContour(const std::vector<cv::Point> &contour)
 {
     return cv::boundingRect(contour);
 }
-

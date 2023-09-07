@@ -11,7 +11,7 @@ using rectangle_points = std::map<size_t, std::vector<cv::Point>>;
 class ObjectTracking
 {
 public:
-    explicit ObjectTracking(size_t memory = Constants::Memory::TRAJECTORY_MEMORY) : _memory(memory) {}
+    explicit ObjectTracking(size_t memory = consts::mem::TRAJECTORY_MEMORY) : _memory(memory) {}
 
     void writeTrajectory(cv::Mat& frame, const std::map<size_t, cv::Rect>& rectangles);
 
