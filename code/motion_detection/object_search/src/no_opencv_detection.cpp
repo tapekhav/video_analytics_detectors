@@ -59,50 +59,53 @@ void NoOpenCVDetection::findContours(const cv::Mat &frame, std::vector<std::vect
     {
         for (int j = 0; j < _params.width; j += 10)
         {
-            if (!_visited[i][j])
+            if (!_visited[i][j] && frame.at<uchar>(i, j) > _threshold_value)
             {
                 std::vector<cv::Point> contour = {cv::Point(0.0, 1.0)};
                 cv::Point point(j, i);
-                traceContour(frame, point, contour);
+                bfs(frame, point, contour);
                 contours.push_back(contour);
             }
         }
     }
 }
 
-void NoOpenCVDetection::traceContour(const cv::Mat& frame, const cv::Point& point, std::vector<cv::Point>& contour)
+void NoOpenCVDetection::bfs(const cv::Mat& frame, const cv::Point& point, std::vector<cv::Point>& contour)
 {
-    if (point.y >= _params.height || point.x >= _params.width)
-    {
-        return;
-    }
+    std::queue<cv::Point> queue;
+    queue.push(point);
 
-    if (frame.at<uchar>(point.x, point.y) > _threshold_value || _visited[point.y][point.x])
+    while (!queue.empty())
     {
-        return;
-    }
-    _visited[point.y][point.x] = true;
-    contour.push_back(point);
+        auto p = queue.front();
+        queue.pop();
+        _visited[point.y][point.x] = true;
 
-    for (size_t i = 0; i < 8; ++i)
-    {
-        traceContour(frame, cv::Point(point.x + consts::moore::dx[i], point.y + consts::moore::dy[i]), contour);
+        //! TODO change 4 to const
+        for (int i = 0; i < 4; ++i)
+        {
+            if (point.y + consts::moore::dy[i] < _params.height && point.x + consts::moore::dx[i] < _params.width
+            && frame.at<uchar>(point.y + consts::moore::dy[i], point.x + consts::moore::dx[i]) < _threshold_value)
+            {
+                queue.pop();
+            }
+        }
     }
 }
 
 cv::Mat NoOpenCVDetection::gaussianFilter(const cv::Mat &in_frame)
 {
-    auto out_frame = grey::castToGrey(_blur.gaussianBlur(in_frame));
+    // auto out_frame = grey::castToGrey(_blur.gaussianBlur(in_frame));
 
     cv::Mat zxc = in_frame.clone();
     cv::GaussianBlur(in_frame, zxc, _blur_kernel_size, 0, 0);
     cv::cvtColor(zxc, zxc, cv::COLOR_BGR2GRAY);
 
-    cv::imshow("Frame", out_frame);
-    cv::imshow("zxc", zxc);
+    //cv::imshow("Frame", out_frame);
+    //cv::imshow("zxc", zxc);
     cv::waitKey();
 
-    return out_frame;
+    return zxc;
 }
 
 double NoOpenCVDetection::findArea(const std::vector<cv::Point> &contour)

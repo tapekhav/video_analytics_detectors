@@ -29,7 +29,7 @@ private:
 
     cv::Rect boundContour(const std::vector<cv::Point> &contour) final;
 
-    void traceContour(const cv::Mat& frame, const cv::Point& point, std::vector<cv::Point>& contour);
+    void bfs(const cv::Mat& frame, const cv::Point& point, std::vector<cv::Point>& contour);
 
     void findContours(const cv::Mat& frame, std::vector<std::vector<cv::Point>>& contours);
 
