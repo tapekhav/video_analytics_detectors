@@ -12,7 +12,7 @@ AbstractMotionDetection::AbstractMotionDetection(cv::Size params,
                                                   _threshold_value(threshold),
                                                   _dilate_kernel_size(std::move(dilate_kernel_size)),
                                                   _blur_kernel_size(std::move(blur_kernel_size)),
-                                                  _sum_frames(cv::Mat::zeros(_params, CV_8UC3)),
+                                                  _sum_frames(_params, CV_8UC1),
                                                   _capacity(_frames),
                                                   _max_deviation(max_deviation),
                                                   _max_elapsed_time(max_elapsed_time),
@@ -134,17 +134,12 @@ void AbstractMotionDetection::findPermanentRectangles(std::vector<cv::Rect> &rec
 
 void AbstractMotionDetection::addFrames(const cv::Mat& cur_frame)
 {
-    auto frame = gaussianFilter(cur_frame);
-
-    _sum_frames += frame;
-    _frames.push_back(frame);
+    _frames.push_back(gaussianFilter(cur_frame));
 }
 
 void AbstractMotionDetection::changeSum(const cv::Mat &cur_frame)
 {
     addFrames(cur_frame);
-
-    _sum_frames -= _frames.front();
     _frames.pop_front();
 }
 

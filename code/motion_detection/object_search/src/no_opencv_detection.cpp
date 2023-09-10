@@ -31,7 +31,7 @@ cv::Mat NoOpenCVDetection::getAbsDiff(const cv::Mat &cur_frame) const
 {
     cv::Mat diff, sum;
     sum = getMeanSum();
-    cv::absdiff(cur_frame, sum, diff);
+    cv::absdiff(grey::castToGrey(cur_frame), sum, diff);
 
     return diff;
 }
@@ -87,6 +87,7 @@ void NoOpenCVDetection::bfs(const cv::Mat& frame, const cv::Point& point, std::v
             if (point.y + consts::moore::dy[i] < _params.height && point.x + consts::moore::dx[i] < _params.width
             && frame.at<uchar>(point.y + consts::moore::dy[i], point.x + consts::moore::dx[i]) < _threshold_value)
             {
+                _visited[point.y][point.x] = true;
                 queue.pop();
             }
         }
@@ -103,7 +104,7 @@ cv::Mat NoOpenCVDetection::gaussianFilter(const cv::Mat &in_frame)
 
     //cv::imshow("Frame", out_frame);
     //cv::imshow("zxc", zxc);
-    cv::waitKey();
+    //cv::waitKey();
 
     return zxc;
 }

@@ -20,9 +20,11 @@ OpenCVDetection::OpenCVDetection(cv::Size params,
 
 cv::Mat OpenCVDetection::getAbsDiff(const cv::Mat &cur_frame) const
 {
-    cv::Mat diff, sum;
-    sum = getMeanSum();
-    cv::absdiff(cur_frame, sum, diff);
+    cv::Mat diff, out;
+    auto sum = getMeanSum();
+
+    cv::cvtColor(cur_frame, out, cv::COLOR_BGR2GRAY);
+    cv::absdiff(out, sum, diff);
 
     return diff;
 }
