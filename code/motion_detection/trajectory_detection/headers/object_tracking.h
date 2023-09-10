@@ -16,7 +16,8 @@ public:
     void writeTrajectory(cv::Mat& frame, const std::map<size_t, cv::Rect>& rectangles);
 
 private:
-    void oneRectangleTrajectory(cv::Mat& frame, size_t id, const cv::Rect& rectangle);
+    void oneRectangleTrajectory(cv::Mat& frame, size_t id, std::vector<cv::Point>& positions,
+                                std::vector<size_t>& to_del);
 
 private:
     rectangle_points _history;
