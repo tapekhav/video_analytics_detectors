@@ -41,30 +41,33 @@ std::vector<std::vector<cv::Point>> NoOpenCVDetection::findContours(const cv::Ma
     cv::Mat diff = getAbsDiff(cur_frame);
     changeSum(cur_frame);
 
-    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, _dilate_kernel_size);
-    cv::dilate(diff, diff, kernel);
+    // cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, _dilate_kernel_size);
+    // cv::dilate(diff, diff, kernel);
 
-    cv::threshold(diff, diff, _threshold_value, consts::thresholds::MAX_THRESHOLDS, cv::THRESH_BINARY);
+    //cv::threshold(diff, diff, _threshold_value, consts::thresholds::MAX_THRESHOLDS, cv::THRESH_BINARY);
 
     std::vector<std::vector<cv::Point>> contours;
-    // findContours(diff, contours);
-    cv::findContours(diff, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+    findContours(diff, contours);
+    // cv::findContours(diff, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
     return contours;
 }
 
 void NoOpenCVDetection::findContours(const cv::Mat &frame, std::vector<std::vector<cv::Point>>& contours)
 {
-    for (int i = 0; i < _params.height; i += 10)
+    for (int i = 50; i < _params.height / 4; i += 50)
     {
-        for (int j = 0; j < _params.width; j += 10)
+        for (int j = 50; j < _params.width / 4; j += 50)
         {
-            if (!_visited[i][j] && frame.at<uchar>(i, j) > _threshold_value)
+            if (!_visited[i][j] && frame.at<uchar>(j, i) >= _threshold_value)
             {
-                std::vector<cv::Point> contour = {cv::Point(0.0, 1.0)};
+                std::vector<cv::Point> contour;
                 cv::Point point(j, i);
                 bfs(frame, point, contour);
-                contours.push_back(contour);
+                if (!contour.empty())
+                {
+                    contours.push_back(contour);
+                }
             }
         }
     }
@@ -73,22 +76,26 @@ void NoOpenCVDetection::findContours(const cv::Mat &frame, std::vector<std::vect
 void NoOpenCVDetection::bfs(const cv::Mat& frame, const cv::Point& point, std::vector<cv::Point>& contour)
 {
     std::queue<cv::Point> queue;
+
     queue.push(point);
 
     while (!queue.empty())
     {
-        auto p = queue.front();
+        cv::Point p(queue.front());
+        contour.push_back(p);
+        _visited[p.y][p.x] = true;
         queue.pop();
-        _visited[point.y][point.x] = true;
 
         //! TODO change 4 to const
         for (int i = 0; i < 4; ++i)
         {
-            if (point.y + consts::moore::dy[i] < _params.height && point.x + consts::moore::dx[i] < _params.width
-            && frame.at<uchar>(point.y + consts::moore::dy[i], point.x + consts::moore::dx[i]) < _threshold_value)
+            auto point_y = p.y + consts::moore::dy[i];
+            auto point_x = p.x + consts::moore::dx[i];
+            if (point_y < _params.height && point_y > 0 && point_x < _params.width && point_x > 0
+            && frame.at<uchar>(point_y, point_x) >= _threshold_value && !_visited[point_y][point_x])
             {
-                _visited[point.y][point.x] = true;
-                queue.pop();
+                _visited[point_y][point_x] = true;
+                queue.emplace(point_x, point_y);
             }
         }
     }
@@ -111,10 +118,10 @@ cv::Mat NoOpenCVDetection::gaussianFilter(const cv::Mat &in_frame)
 
 double NoOpenCVDetection::findArea(const std::vector<cv::Point> &contour)
 {
-    return cv::contourArea(contour);
+    return contour.empty() ? 0 : cv::contourArea(contour);
 }
 
 cv::Rect NoOpenCVDetection::boundContour(const std::vector<cv::Point> &contour)
 {
-    return cv::boundingRect(contour);
+    return contour.empty() ? cv::Rect(0, 0, 0, 0) : cv::boundingRect(contour);
 }

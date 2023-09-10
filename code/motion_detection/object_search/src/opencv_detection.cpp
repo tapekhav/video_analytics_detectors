@@ -11,12 +11,12 @@ OpenCVDetection::OpenCVDetection(cv::Size params,
                                  int max_deviation,
                                  int patience,
                                  int max_elapsed_time)
-        : AbstractMotionDetection(std::move(params),
-                                  threshold, std::move(dilate_kernel_size),
-                                  frames, std::move(blur_kernel_size),
-                                  max_deviation,
-                                  patience,
-                                  max_elapsed_time) {}
+                                 : AbstractMotionDetection(std::move(params),
+                                                           threshold, std::move(dilate_kernel_size),
+                                                           frames, std::move(blur_kernel_size),
+                                                           max_deviation,
+                                                           patience,
+                                                           max_elapsed_time) {}
 
 cv::Mat OpenCVDetection::getAbsDiff(const cv::Mat &cur_frame) const
 {
