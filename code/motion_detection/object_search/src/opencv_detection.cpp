@@ -63,3 +63,56 @@ cv::Rect OpenCVDetection::boundContour(const std::vector<cv::Point> &contour)
 {
     return cv::boundingRect(contour);
 }
+
+std::map<size_t, cv::Rect> OpenCVDetection::detectMotion(cv::Mat &cur_frame)
+{
+    if (_frames.size() != _capacity)
+    {
+        addFrames(cur_frame);
+        return {};
+    }
+
+    std::vector<std::vector<cv::Point>> contours = findContours(cur_frame);
+
+    double background_area_threshold = 0.05 * _params.height * _params.width;
+    double background_min_area = 1e-4 * _params.height * _params.width;
+
+    std::vector<cv::Rect> rectangles;
+    for (size_t i = 0; i < contours.size() - 1; ++i)
+    {
+        double area = findArea(contours[i]);
+
+        for (size_t j = i + 1; j < i + 20 && j < contours.size(); ++j)
+        {
+            if (geom::checkDistContours(contours[i], contours[j]) < 30)
+            {
+                geom::mergeContours(contours[i], contours[j]);
+            }
+        }
+
+        if (area < background_area_threshold && area > background_min_area)
+        {
+            cv::Rect bound_rect = boundContour(contours[i]);
+            rectangles.push_back(bound_rect);
+        }
+    }
+
+    deleteInnerRectangles(rectangles);
+    findPermanentRectangles(rectangles);
+
+    for (const auto& rect : rectangles)
+    {
+        cv::rectangle(cur_frame, rect, consts::color_map.at(RED), consts::thickness::MEDIUM, cv::LINE_8);
+    }
+
+    std::map<size_t, cv::Rect> result;
+    for (size_t i = 0; i < rectangles.size(); ++i)
+    {
+        if (std::get<0>(_rectangles_center[i]) >= _patience)
+        {
+            result[i] = _rectangles[i];
+        }
+    }
+
+    return result;
+}

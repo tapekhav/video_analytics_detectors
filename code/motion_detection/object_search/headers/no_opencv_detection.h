@@ -17,22 +17,21 @@ public:
                                int max_elapsed_time = consts::ext_rect::k_max_elapsed_time,
                                int my_kernel_size = 5);
 
+    std::map<size_t, cv::Rect> detectMotion(cv::Mat &cur_frame) final;
+
     ~NoOpenCVDetection() final = default; 
 private:
     [[nodiscard]] cv::Mat getAbsDiff(const cv::Mat& cur_frame) const;   
 
-    std::vector<std::vector<cv::Point>> findContours(const cv::Mat &cur_frame) final;
+    std::vector<cv::Rect> findRectangles(const cv::Mat &cur_frame);
 
     cv::Mat gaussianFilter(const cv::Mat &in_frame) final;
 
-    double findArea(const std::vector<cv::Point> &contour) final;
+    void bfs(const cv::Mat& frame, const cv::Point& point, cv::Rect& rect);
 
-    cv::Rect boundContour(const std::vector<cv::Point> &contour) final;
+    void findRects(const cv::Mat& frame, std::vector<cv::Rect>& contours);
 
-    void bfs(const cv::Mat& frame, const cv::Point& point, std::vector<cv::Point>& contour);
-
-    void findContours(const cv::Mat& frame, std::vector<std::vector<cv::Point>>& contours);
-
+    bool insideContour(const std::vector<cv::Rect>& contours, const cv::Point& point);
 private:
     GaussianBlur _blur;
 

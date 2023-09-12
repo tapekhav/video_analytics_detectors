@@ -12,7 +12,7 @@
 class AbstractMotionDetection
 {
 public:
-    std::map<size_t, cv::Rect> detectMotion(cv::Mat& cur_frame);
+    virtual std::map<size_t, cv::Rect> detectMotion(cv::Mat& cur_frame) = 0;
 
     virtual ~AbstractMotionDetection() = default;
 protected:
@@ -36,12 +36,6 @@ protected:
     [[nodiscard]] cv::Mat getMeanSum() const;
 
     virtual cv::Mat gaussianFilter(const cv::Mat& in_frame) = 0;
-
-    virtual std::vector<std::vector<cv::Point>> findContours(const cv::Mat &cur_frame) = 0;
-
-    virtual double findArea(const std::vector<cv::Point>& contour) = 0;
-
-    virtual cv::Rect boundContour(const std::vector<cv::Point>& contour) = 0;
 protected:
     cv::Size _params;
     int _threshold_value;
