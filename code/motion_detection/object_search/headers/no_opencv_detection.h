@@ -29,6 +29,8 @@ private:
 
     void bfs(const cv::Mat& frame, const cv::Point& point, cv::Rect& rect);
 
+    void mergeRectangles(std::vector<cv::Rect>& rectangles);
+
     void findRects(const cv::Mat& frame, std::vector<cv::Rect>& contours);
 
     bool insideContour(const std::vector<cv::Rect>& contours, const cv::Point& point);
