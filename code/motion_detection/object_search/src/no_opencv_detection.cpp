@@ -58,10 +58,11 @@ void NoOpenCVDetection::findRects(const cv::Mat &frame, std::vector<cv::Rect>& c
     double max_area = 0.05 * _params.height * _params.width;
     double min_area = 1e-4 * _params.height * _params.width;
 
-    for (int y = 50; y < _params.height; y += 50)
+    for (int y = 40; y < _params.height; y += 40)
     {
-        for (int x = 50; x < _params.width; x += 50)
+        for (int x = 40; x < _params.width; x += 40)
         {
+            std::cout << y << " " << x << "\t" << static_cast<int>(frame.at<uchar>(y, x)) << "\n";
             if (frame.at<uchar>(y, x) >= _threshold_value)
             {
                 if (insideContour(contours, cv::Point(x, y)))
@@ -71,8 +72,8 @@ void NoOpenCVDetection::findRects(const cv::Mat &frame, std::vector<cv::Rect>& c
 
                 cv::Rect rect;
                 bfs(frame, cv::Point(x, y), rect);
-                auto s = rect.width * rect.height;
-                if (s > min_area && s < max_area)
+                // auto s = rect.width * rect.height;
+                // if (s > min_area && s < max_area)
                 {
                     contours.push_back(rect);
                 }
@@ -84,20 +85,22 @@ void NoOpenCVDetection::findRects(const cv::Mat &frame, std::vector<cv::Rect>& c
 void NoOpenCVDetection::bfs(const cv::Mat& frame, const cv::Point& point, cv::Rect& rect)
 {
     rect = cv::Rect(point, point);
-    const int step = 50;
+    const int step = 40;
 
-    cv::Point min_point = {(-point.x + step - 1) / step, (-point.y + step - 1) / step};
-    cv::Point max_point = {(_params.width - point.x - 1) / step, (_params.height - point.y - 1) / step};
+    cv::Point min_point((-point.x + step) / step, (-point.y + step) / step);
+    cv::Point max_point((_params.width - point.x) / step, (_params.height - point.y) / step);
 
-    std::vector<std::vector<bool>> visited(max_point.y - min_point.y + 1,
-                                           std::vector<bool>(max_point.x - min_point.x + 1));
+
+    std::vector<std::vector<bool>> visited((max_point - min_point).y + 1,
+                                            std::vector<bool>((max_point - min_point).x + 1, false));
 
     int height = static_cast<int>(visited.size());
     int width = static_cast<int>(visited[0].size());
 
     std::queue<cv::Point> q;
 
-    cv::Point new_point(point.x / step - min_point.x, point.y / step - min_point.y);
+    cv::Point new_point(point.x / step, point.y / step);
+    std::cout << visited.size()  << " " << visited[0].size() << "\t" << new_point << "\n";
     visited[new_point.y][new_point.x] = true;
     q.push(new_point);
 
@@ -109,34 +112,21 @@ void NoOpenCVDetection::bfs(const cv::Mat& frame, const cv::Point& point, cv::Re
         new_point = q.front();
         q.pop();
 
+
         cv::Point real_point(offset_x + new_point.x * step, offset_y + new_point.y * step);
         if (frame.at<uchar>(real_point) < _threshold_value)
         {
             continue;
         }
 
-        if (real_point.x < rect.x)
-        {
-            rect.x = real_point.x;
-        }
-        if (real_point.y < rect.y)
-        {
-            rect.y = real_point.y;
-        }
-        if (real_point.x > rect.x + rect.width)
-        {
-            rect.width = real_point.x - rect.x;
-        }
-        if (real_point.y > rect.y + rect.height)
-        {
-            rect.height = real_point.y - rect.y;
-        }
-
+        rect.x = std::min(rect.x, real_point.x);
+        rect.y = std::min(rect.y, real_point.y);
+        rect.width = std::max(rect.width, real_point.x - rect.x);
+        rect.height = std::max(rect.height, real_point.y - rect.y);
 
         // TODO вынести в константу
         for (size_t i = 0; i < 4; ++i)
         {
-            // TODO check this think about var new_point
             auto p(cv::Point(point.x + consts::moore::dx[i], point.y + consts::moore::dy[i]));
 
             if (p.x >= 0 && p.y >= 0 && p.y < height && p.x < width && !visited[p.y][p.x])
@@ -148,21 +138,6 @@ void NoOpenCVDetection::bfs(const cv::Mat& frame, const cv::Point& point, cv::Re
     }
 }
 
-cv::Mat NoOpenCVDetection::gaussianFilter(const cv::Mat &in_frame)
-{
-    // auto out_frame = grey::castToGrey(_blur.gaussianBlur(in_frame));
-
-    cv::Mat zxc = in_frame.clone();
-    cv::GaussianBlur(in_frame, zxc, _blur_kernel_size, 0, 0);
-    cv::cvtColor(zxc, zxc, cv::COLOR_BGR2GRAY);
-
-    //cv::imshow("Frame", out_frame);
-    //cv::imshow("zxc", zxc);
-    //cv::waitKey();
-
-    return zxc;
-}
-
 std::map<size_t, cv::Rect> NoOpenCVDetection::detectMotion(cv::Mat &cur_frame) {
     if (_frames.size() != _capacity)
     {
@@ -172,7 +147,7 @@ std::map<size_t, cv::Rect> NoOpenCVDetection::detectMotion(cv::Mat &cur_frame) {
 
     std::vector<cv::Rect> rectangles = findRectangles(cur_frame);
 
-    deleteInnerRectangles(rectangles);
+    // deleteInnerRectangles(rectangles);
     findPermanentRectangles(rectangles);
 
     for (const auto& rect : rectangles)
@@ -197,4 +172,9 @@ bool NoOpenCVDetection::insideContour(const std::vector<cv::Rect> &contours, con
     {
         return geom::isInnerPoint(point, rect);
     });
+}
+
+cv::Mat NoOpenCVDetection::gaussianFilter(const cv::Mat &in_frame)
+{
+    return grey::castToGrey(in_frame);
 }
