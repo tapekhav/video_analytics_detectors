@@ -8,9 +8,9 @@ class OpenCVDetection final : public AbstractMotionDetection
 {
 public:
     explicit OpenCVDetection(cv::Size params,
-                             int threshold = consts::thresholds::THRESHOLD_VALUE,
+                             int threshold = consts::thresholds::k_threshold_value,
                              cv::Size dilate_kernel_size = {5, 5},
-                             size_t frames = consts::mem::MOTION_DETECTION_MEMORY,
+                             size_t frames = consts::mem::k_motion_detection_memory,
                              cv::Size blur_kernel_size = {9, 9},
                              int max_deviation = consts::ext_rect::k_max_deviation,
                              int patience = consts::ext_rect::k_patience,

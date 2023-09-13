@@ -22,6 +22,13 @@ namespace consts
         THICK = 8
     };
 
+    enum step
+    {
+        BIG_STEP = 40,
+        AVERAGE_STEP = 10,
+        SMALL_STEP = 5
+    };
+
     static const std::map<Color, cv::Scalar> color_map =
     {
             {RED, cv::Scalar(0, 0, 255)},
@@ -32,14 +39,14 @@ namespace consts
 
     namespace thresholds
     {
-        const int MAX_THRESHOLDS = 255;
-        const int THRESHOLD_VALUE = 50;
+        const int k_max_thresholds = 255;
+        const int k_threshold_value = 50;
     };
 
     namespace mem
     {
-        const size_t TRAJECTORY_MEMORY = 30;
-        const size_t MOTION_DETECTION_MEMORY = 15;
+        const size_t k_trajectory_memory = 30;
+        const size_t k_motion_detection_memory = 15;
     };
 
     namespace ext_rect
@@ -49,8 +56,9 @@ namespace consts
         const int k_max_elapsed_time = 3;
     };
 
-    namespace moore
+    namespace four_connectivity
     {
+        const int size = 4;
         const int dx[] = {0, 0, -1, 1};
         const int dy[] = {1, -1, 0, 0};
     }

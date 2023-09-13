@@ -9,7 +9,8 @@ NoOpenCVDetection::NoOpenCVDetection(cv::Size params,
                                      int max_deviation,
                                      int patience,
                                      int max_elapsed_time,
-                                     int my_kernel_size)
+                                     int my_kernel_size,
+                                     int step)
                                      : AbstractMotionDetection(std::move(params),
                                                                threshold,
                                                                std::move(dilate_kernel_size),
@@ -18,7 +19,8 @@ NoOpenCVDetection::NoOpenCVDetection(cv::Size params,
                                                                max_deviation,
                                                                patience,
                                                                max_elapsed_time),
-                                                               _blur(9, 3.0)
+                                                               _blur(9, 3.0),
+                                                               _step(step)
                                                                {
                                                                     for (size_t i = 0; i < _params.height; ++i)
                                                                     {
@@ -54,9 +56,9 @@ void NoOpenCVDetection::findRects(const cv::Mat &frame, std::vector<cv::Rect>& c
 {
     const double min_area = 1e-4 * _params.height * _params.width;
 
-    for (int y = 40; y < _params.height; y += 40)
+    for (int y = _step; y < _params.height; y += _step)
     {
-        for (int x = 40; x < _params.width; x += 40)
+        for (int x = _step; x < _params.width; x += _step)
         {
             if (frame.at<uchar>(y, x) >= _threshold_value - 5)
             {
@@ -76,10 +78,9 @@ void NoOpenCVDetection::findRects(const cv::Mat &frame, std::vector<cv::Rect>& c
 void NoOpenCVDetection::bfs(const cv::Mat& frame, const cv::Point& point, cv::Rect& rect)
 {
     rect = cv::Rect(point, point);
-    const int step = 40;
 
-    cv::Point min_point((-point.x + step) / step, (-point.y + step) / step);
-    cv::Point max_point((_params.width - point.x) / step, (_params.height - point.y) / step);
+    cv::Point min_point((-point.x + _step) / _step, (-point.y + _step) / _step);
+    cv::Point max_point((_params.width - point.x) / _step, (_params.height - point.y) / _step);
 
 
     std::vector<std::vector<bool>> visited((max_point - min_point).y + 1,
@@ -90,12 +91,12 @@ void NoOpenCVDetection::bfs(const cv::Mat& frame, const cv::Point& point, cv::Re
 
     std::queue<cv::Point> q;
 
-    cv::Point new_point(point.x / step, point.y / step);
+    cv::Point new_point(point.x / _step, point.y / _step);
     visited[new_point.y][new_point.x] = true;
     q.push(new_point);
 
-    int offset_x = point.x % step;
-    int offset_y = point.y % step;
+    int offset_x = point.x % _step;
+    int offset_y = point.y % _step;
 
     while (!q.empty())
     {
@@ -103,7 +104,7 @@ void NoOpenCVDetection::bfs(const cv::Mat& frame, const cv::Point& point, cv::Re
         q.pop();
 
 
-        cv::Point real_point(offset_x + new_point.x * step, offset_y + new_point.y * step);
+        cv::Point real_point(offset_x + new_point.x * _step, offset_y + new_point.y * _step);
         if (frame.at<uchar>(real_point) < _threshold_value - 5)
         {
             continue;
@@ -114,10 +115,9 @@ void NoOpenCVDetection::bfs(const cv::Mat& frame, const cv::Point& point, cv::Re
         rect.width = std::max(rect.width, real_point.x - rect.x);
         rect.height = std::max(rect.height, real_point.y - rect.y);
 
-        // TODO вынести в константу
-        for (size_t i = 0; i < 4; ++i)
+        for (size_t i = 0; i < consts::four_connectivity::size; ++i)
         {
-            auto p(cv::Point(point.x + consts::moore::dx[i], point.y + consts::moore::dy[i]));
+            auto p(cv::Point(point.x + consts::four_connectivity::dx[i], point.y + consts::four_connectivity::dy[i]));
 
             if (p.x >= 0 && p.y >= 0 && p.y < height && p.x < width && !visited[p.y][p.x])
             {
@@ -172,11 +172,11 @@ cv::Mat NoOpenCVDetection::gaussianFilter(const cv::Mat &in_frame)
 
 void NoOpenCVDetection::mergeRectangles(std::vector<cv::Rect> &rectangles)
 {
-    auto isShortDistance = [](const cv::Rect& first, const cv::Rect& second)
+    auto isShortDistance = [this](const cv::Rect& first, const cv::Rect& second)
     {
         auto min_dist = std::min(first.width / 2 + second.width / 2, first.height / 2 + second.height / 2);
 
-        return geom::findDistanceRectangles(first, second) < min_dist + 2 * 40;
+        return geom::findDistanceRectangles(first, second) < min_dist + 2 * _step;
     };
 
     for (size_t i = 0; i < rectangles.size() - 1; ++i)

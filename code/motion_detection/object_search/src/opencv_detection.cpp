@@ -37,7 +37,7 @@ std::vector<std::vector<cv::Point>> OpenCVDetection::findContours(const cv::Mat 
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, _dilate_kernel_size);
     cv::dilate(diff, diff, kernel);
 
-    cv::threshold(diff, diff, _threshold_value, consts::thresholds::MAX_THRESHOLDS, cv::THRESH_BINARY);
+    cv::threshold(diff, diff, _threshold_value, consts::thresholds::k_max_thresholds, cv::THRESH_BINARY);
 
     std::vector<std::vector<cv::Point>> contours;
     cv::findContours(diff, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
