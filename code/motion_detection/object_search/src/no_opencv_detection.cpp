@@ -128,34 +128,22 @@ void NoOpenCVDetection::bfs(const cv::Mat& frame, const cv::Point& point, cv::Re
     }
 }
 
-std::map<size_t, cv::Rect> NoOpenCVDetection::detectMotion(cv::Mat &cur_frame) {
-    if (_frames.size() != _capacity)
+std::map<size_t, cv::Rect> NoOpenCVDetection::detectMotion(cv::Mat &cur_frame)
+{
+    if(addFirstFrames(cur_frame))
     {
-        addFrames(cur_frame);
         return {};
     }
 
-    std::vector<cv::Rect> rectangles = findRectangles(cur_frame);
+    auto rectangles = findRectangles(cur_frame);
 
     mergeRectangles(rectangles);
-    // deleteInnerRectangles(rectangles);
+    deleteInnerRectangles(rectangles);
     findPermanentRectangles(rectangles);
 
-    for (const auto& rect : rectangles)
-    {
-        cv::rectangle(cur_frame, rect, consts::color_map.at(RED), consts::thickness::MEDIUM, cv::LINE_8);
-    }
+    drawRectangles(cur_frame, rectangles);
 
-    std::map<size_t, cv::Rect> result;
-    for (size_t i = 0; i < rectangles.size(); ++i)
-    {
-        if (std::get<0>(_rectangles_center[i]) >= _patience)
-        {
-            result[i] = _rectangles[i];
-        }
-    }
-
-    return result;
+    return getResult(rectangles);
 }
 
 bool NoOpenCVDetection::insideContour(const std::vector<cv::Rect> &contours, const cv::Point& point) {

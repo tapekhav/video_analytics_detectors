@@ -29,6 +29,8 @@ private:
     double findArea(const std::vector<cv::Point>& contour);
 
     cv::Rect boundContour(const std::vector<cv::Point>& contour);
+
+    std::vector<cv::Rect> findRectangles(const cv::Mat& frame) final;
 };
 
 #endif //VIDEO_ANALYTICS_DETECTORS_OPENCV_DETECTION_H

@@ -29,13 +29,21 @@ protected:
 
     void findPermanentRectangles(std::vector<cv::Rect> &rectangles);
 
-    void addFrames(const cv::Mat& cur_frame);
+    void addFrames(const cv::Mat& frame);
 
-    void changeSum(const cv::Mat &cur_frame);
+    void changeSum(const cv::Mat &frame);
+
+    bool addFirstFrames(const cv::Mat& frame);
 
     [[nodiscard]] cv::Mat getMeanSum() const;
 
     virtual cv::Mat gaussianFilter(const cv::Mat& in_frame) = 0;
+
+    virtual std::vector<cv::Rect> findRectangles(const cv::Mat& frame) = 0;
+
+    void drawRectangles(const cv::Mat& frame, const std::vector<cv::Rect>& rectangles);
+
+    std::map<size_t, cv::Rect> getResult(const std::vector<cv::Rect>& rectangles);
 protected:
     cv::Size _params;
     int _threshold_value;

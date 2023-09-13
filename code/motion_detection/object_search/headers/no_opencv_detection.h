@@ -24,7 +24,7 @@ public:
 private:
     [[nodiscard]] cv::Mat getAbsDiff(const cv::Mat& cur_frame) const;   
 
-    std::vector<cv::Rect> findRectangles(const cv::Mat &cur_frame);
+    std::vector<cv::Rect> findRectangles(const cv::Mat &cur_frame) final;
 
     cv::Mat gaussianFilter(const cv::Mat &in_frame) final;
 

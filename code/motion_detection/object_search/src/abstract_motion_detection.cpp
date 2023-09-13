@@ -132,14 +132,14 @@ void AbstractMotionDetection::findPermanentRectangles(std::vector<cv::Rect> &rec
 }
 
 
-void AbstractMotionDetection::addFrames(const cv::Mat& cur_frame)
+void AbstractMotionDetection::addFrames(const cv::Mat& frame)
 {
-    _frames.push_back(gaussianFilter(cur_frame));
+    _frames.push_back(gaussianFilter(frame));
 }
 
-void AbstractMotionDetection::changeSum(const cv::Mat &cur_frame)
+void AbstractMotionDetection::changeSum(const cv::Mat &frame)
 {
-    addFrames(cur_frame);
+    addFrames(frame);
     _frames.pop_front();
 }
 
@@ -153,4 +153,37 @@ cv::Mat AbstractMotionDetection::getMeanSum() const
     }
 
     return sum;
+}
+
+bool AbstractMotionDetection::addFirstFrames(const cv::Mat &frame)
+{
+    if (_frames.size() != _capacity)
+    {
+        addFrames(frame);
+        return true;
+    }
+
+    return false;
+}
+
+void AbstractMotionDetection::drawRectangles(const cv::Mat& frame, const std::vector<cv::Rect> &rectangles)
+{
+    for (const auto& rect : rectangles)
+    {
+        cv::rectangle(frame, rect, consts::color_map.at(RED), consts::thickness::MEDIUM, cv::LINE_8);
+    }
+}
+
+std::map<size_t, cv::Rect> AbstractMotionDetection::getResult(const std::vector<cv::Rect> &rectangles)
+{
+    std::map<size_t, cv::Rect> result;
+    for (size_t i = 0; i < rectangles.size(); ++i)
+    {
+        if (std::get<0>(_rectangles_center[i]) >= _patience)
+        {
+            result[i] = _rectangles[i];
+        }
+    }
+
+    return result;
 }

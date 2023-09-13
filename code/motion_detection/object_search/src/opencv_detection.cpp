@@ -66,13 +66,24 @@ cv::Rect OpenCVDetection::boundContour(const std::vector<cv::Point> &contour)
 
 std::map<size_t, cv::Rect> OpenCVDetection::detectMotion(cv::Mat &cur_frame)
 {
-    if (_frames.size() != _capacity)
+    if(addFirstFrames(cur_frame))
     {
-        addFrames(cur_frame);
         return {};
     }
 
-    std::vector<std::vector<cv::Point>> contours = findContours(cur_frame);
+    auto rectangles = findRectangles(cur_frame);
+
+    deleteInnerRectangles(rectangles);
+    findPermanentRectangles(rectangles);
+
+    drawRectangles(cur_frame, rectangles);
+
+    return getResult(rectangles);
+}
+
+std::vector<cv::Rect> OpenCVDetection::findRectangles(const cv::Mat &frame)
+{
+    std::vector<std::vector<cv::Point>> contours = findContours(frame);
 
     double background_area_threshold = 0.05 * _params.height * _params.width;
     double background_min_area = 1e-4 * _params.height * _params.width;
@@ -97,22 +108,5 @@ std::map<size_t, cv::Rect> OpenCVDetection::detectMotion(cv::Mat &cur_frame)
         }
     }
 
-    deleteInnerRectangles(rectangles);
-    findPermanentRectangles(rectangles);
-
-    for (const auto& rect : rectangles)
-    {
-        cv::rectangle(cur_frame, rect, consts::color_map.at(RED), consts::thickness::MEDIUM, cv::LINE_8);
-    }
-
-    std::map<size_t, cv::Rect> result;
-    for (size_t i = 0; i < rectangles.size(); ++i)
-    {
-        if (std::get<0>(_rectangles_center[i]) >= _patience)
-        {
-            result[i] = _rectangles[i];
-        }
-    }
-
-    return result;
+    return rectangles;
 }
