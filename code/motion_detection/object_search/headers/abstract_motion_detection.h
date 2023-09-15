@@ -12,7 +12,7 @@
 class AbstractMotionDetection
 {
 public:
-    virtual std::map<size_t, cv::Rect> detectMotion(cv::Mat& cur_frame) = 0;
+    std::map<size_t, cv::Rect> detectMotion(cv::Mat& cur_frame);
 
     virtual ~AbstractMotionDetection() = default;
 protected:

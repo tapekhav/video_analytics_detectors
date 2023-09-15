@@ -18,8 +18,6 @@ public:
                                int my_kernel_size = 5,
                                int step = consts::step::AVERAGE_STEP);
 
-    std::map<size_t, cv::Rect> detectMotion(cv::Mat &cur_frame) final;
-
     ~NoOpenCVDetection() final = default; 
 private:
     [[nodiscard]] cv::Mat getAbsDiff(const cv::Mat& cur_frame) const;   

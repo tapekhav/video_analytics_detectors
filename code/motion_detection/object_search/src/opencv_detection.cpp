@@ -64,23 +64,6 @@ cv::Rect OpenCVDetection::boundContour(const std::vector<cv::Point> &contour)
     return cv::boundingRect(contour);
 }
 
-std::map<size_t, cv::Rect> OpenCVDetection::detectMotion(cv::Mat &cur_frame)
-{
-    if(addFirstFrames(cur_frame))
-    {
-        return {};
-    }
-
-    auto rectangles = findRectangles(cur_frame);
-
-    deleteInnerRectangles(rectangles);
-    findPermanentRectangles(rectangles);
-
-    drawRectangles(cur_frame, rectangles);
-
-    return getResult(rectangles);
-}
-
 std::vector<cv::Rect> OpenCVDetection::findRectangles(const cv::Mat &frame)
 {
     std::vector<std::vector<cv::Point>> contours = findContours(frame);

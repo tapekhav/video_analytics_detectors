@@ -16,8 +16,6 @@ public:
                              int patience = consts::ext_rect::k_patience,
                              int max_elapsed_time = consts::ext_rect::k_max_elapsed_time);
 
-    std::map<size_t, cv::Rect> detectMotion(cv::Mat &cur_frame) final;
-
     ~OpenCVDetection() final = default;
 private:
     std::vector<std::vector<cv::Point>> findContours(const cv::Mat& cur_frame);

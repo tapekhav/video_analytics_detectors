@@ -187,3 +187,20 @@ std::map<size_t, cv::Rect> AbstractMotionDetection::getResult(const std::vector<
 
     return result;
 }
+
+std::map<size_t, cv::Rect> AbstractMotionDetection::detectMotion(cv::Mat &cur_frame)
+{
+    if(addFirstFrames(cur_frame))
+    {
+        return {};
+    }
+
+    auto rectangles = findRectangles(cur_frame);
+
+    deleteInnerRectangles(rectangles);
+    findPermanentRectangles(rectangles);
+
+    drawRectangles(cur_frame, rectangles);
+
+    return getResult(rectangles);
+}

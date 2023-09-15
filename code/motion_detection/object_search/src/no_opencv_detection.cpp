@@ -125,23 +125,6 @@ void NoOpenCVDetection::bfs(const cv::Mat& frame, const cv::Point& point, cv::Re
     }
 }
 
-std::map<size_t, cv::Rect> NoOpenCVDetection::detectMotion(cv::Mat &cur_frame)
-{
-    if(addFirstFrames(cur_frame))
-    {
-        return {};
-    }
-
-    auto rectangles = findRectangles(cur_frame);
-
-    deleteInnerRectangles(rectangles);
-    findPermanentRectangles(rectangles);
-
-    drawRectangles(cur_frame, rectangles);
-
-    return getResult(rectangles);
-}
-
 cv::Mat NoOpenCVDetection::gaussianFilter(const cv::Mat &in_frame)
 {
     return grey::castToGrey(in_frame);
