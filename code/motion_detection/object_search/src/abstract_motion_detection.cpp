@@ -12,7 +12,7 @@ AbstractMotionDetection::AbstractMotionDetection(cv::Size params,
                                                   _threshold_value(threshold),
                                                   _dilate_kernel_size(std::move(dilate_kernel_size)),
                                                   _blur_kernel_size(std::move(blur_kernel_size)),
-                                                  _sum_frames(cv::Mat::zeros(_params, CV_8UC3)),
+                                                  _sum_frames(_params, CV_8UC1),
                                                   _capacity(_frames),
                                                   _max_deviation(max_deviation),
                                                   _max_elapsed_time(max_elapsed_time),
@@ -132,20 +132,14 @@ void AbstractMotionDetection::findPermanentRectangles(std::vector<cv::Rect> &rec
 }
 
 
-void AbstractMotionDetection::addFrames(const cv::Mat& cur_frame)
+void AbstractMotionDetection::addFrames(const cv::Mat& frame)
 {
-    cv::Mat frame;
-    gaussianFilter(cur_frame, frame);
-
-    _sum_frames += frame;
-    _frames.push_back(frame);
+    _frames.push_back(gaussianFilter(frame));
 }
 
-void AbstractMotionDetection::changeSum(const cv::Mat &cur_frame)
+void AbstractMotionDetection::changeSum(const cv::Mat &frame)
 {
-    addFrames(cur_frame);
-
-    _sum_frames -= _frames.front();
+    addFrames(frame);
     _frames.pop_front();
 }
 
@@ -161,47 +155,27 @@ cv::Mat AbstractMotionDetection::getMeanSum() const
     return sum;
 }
 
-std::map<size_t, cv::Rect> AbstractMotionDetection::detectMotion(cv::Mat &cur_frame)
+bool AbstractMotionDetection::addFirstFrames(const cv::Mat &frame)
 {
     if (_frames.size() != _capacity)
     {
-        addFrames(cur_frame);
-        return {};
+        addFrames(frame);
+        return true;
     }
 
-    std::vector<std::vector<cv::Point>> contours = findContours(cur_frame);
+    return false;
+}
 
-    double background_area_threshold = 0.05 * _params.height * _params.width;
-    double background_min_area = 1e-4 * _params.height * _params.width;
-
-    std::vector<cv::Rect> rectangles;
-    for (size_t i = 0; i < contours.size() - 1; ++i)
-    {
-        double area = findArea(contours[i]);
-
-        for (size_t j = i + 1; j < i + 20 && j < contours.size(); ++j)
-        {
-            if (geom::checkDistContours(contours[i], contours[j]) < 30)
-            {
-                geom::mergeContours(contours[i], contours[j]);
-            }
-        }
-
-        if (area < background_area_threshold && area > background_min_area)
-        {
-            cv::Rect bound_rect = boundContour(contours[i]);
-            rectangles.push_back(bound_rect);
-        }
-    }
-
-    deleteInnerRectangles(rectangles);
-    findPermanentRectangles(rectangles);
-
+void AbstractMotionDetection::drawRectangles(const cv::Mat& frame, const std::vector<cv::Rect> &rectangles)
+{
     for (const auto& rect : rectangles)
     {
-        cv::rectangle(cur_frame, rect, Constants::color_map.at(RED), Constants::Thickness::MEDIUM, cv::LINE_8);
+        cv::rectangle(frame, rect, consts::color_map.at(RED), consts::thickness::MEDIUM, cv::LINE_8);
     }
+}
 
+std::map<size_t, cv::Rect> AbstractMotionDetection::getResult(const std::vector<cv::Rect> &rectangles)
+{
     std::map<size_t, cv::Rect> result;
     for (size_t i = 0; i < rectangles.size(); ++i)
     {
@@ -212,4 +186,21 @@ std::map<size_t, cv::Rect> AbstractMotionDetection::detectMotion(cv::Mat &cur_fr
     }
 
     return result;
+}
+
+std::map<size_t, cv::Rect> AbstractMotionDetection::detectMotion(cv::Mat &cur_frame)
+{
+    if(addFirstFrames(cur_frame))
+    {
+        return {};
+    }
+
+    auto rectangles = findRectangles(cur_frame);
+
+    deleteInnerRectangles(rectangles);
+    findPermanentRectangles(rectangles);
+
+    drawRectangles(cur_frame, rectangles);
+
+    return getResult(rectangles);
 }

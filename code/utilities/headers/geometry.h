@@ -16,7 +16,11 @@ namespace geom
 
     double calculateDistance(const cv::Point &p1, const cv::Point &p2);
 
+    double findDistanceRectangles(const cv::Rect& first, const cv::Rect& second);
+
     inline cv::Point findCenter(const cv::Rect& rect) { return {rect.x + rect.width / 2, rect.y + rect.height / 2}; }
+
+    void mergeRectangles(cv::Rect& first, const cv::Rect& second);
 }
 
 #endif //VIDEO_ANALYTICS_DETECTORS_GEOMETRY_H

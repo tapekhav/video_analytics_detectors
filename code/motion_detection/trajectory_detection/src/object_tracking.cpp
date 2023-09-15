@@ -1,51 +1,38 @@
 #include <object_tracking.h>
 
-void ObjectTracking::oneRectangleTrajectory(cv::Mat& frame, size_t id, const cv::Rect& rectangle)
-{
-    for (size_t i = 0; i < _history[id].size() - 1; ++i)
-    {
-        cv::line(frame, _history[id][i], _history[id][i + 1], Constants::color_map.at(Color::TURQUOISE),
-                                                              Constants::Thickness::THICK);
-    }
-}
-
-void ObjectTracking::writeTrajectory(cv::Mat &frame, const std::map<size_t, cv::Rect>& rectangles)
+void ObjectTracking::writeTrajectory(cv::Mat& frame, const std::map<size_t, cv::Rect>& rectangles)
 {
     for (auto& figure : rectangles)
     {
         size_t id = figure.first;
-        if (_history.find(id) == _history.end())
-        {
-            _history[id] = {geom::findCenter(figure.second)};
-        }
-        else
-        {
-            _history[id].push_back(geom::findCenter(figure.second));
-        }
-    }
+        cv::Rect object_box = figure.second;
 
-    std::vector<size_t> to_del;
-    for (auto& kv : _history)
-    {
-        size_t id = kv.first;
-        auto& positions = kv.second;
-        for (size_t i = 0; i < positions.size() - 1; ++i)
-        {
-            cv::line(frame, positions[i], positions[i + 1], Constants::color_map.at(Color::TURQUOISE),
-                                                            Constants::Thickness::THICK);
-        }
-        _frame_counter[id] = _frame_counter.find(id) == _frame_counter.end() ? 1 : _frame_counter[id] + 1;
+        std::vector<cv::Point2f> prev_points, curr_points;
+        cv::Point2f center = geom::findCenter(object_box);
+        prev_points.push_back(center);
 
-        if (_frame_counter[id] >= _memory) {
-            positions.erase(positions.begin());
-            if (positions.empty()) {
-                to_del.push_back(id);
+        std::vector<uchar> status;
+        std::vector<float> err;
+        cv::calcOpticalFlowPyrLK(_prev_frame, frame, prev_points, curr_points, status, err);
+
+        if (!status.empty() && status[0] == 1)
+        {
+            cv::Point2f newCenter = curr_points[0];
+            _history[id].push_back(newCenter);
+
+            for (const auto & i : _history[id])
+            {
+                cv::circle(frame, i, consts::thickness::MEDIUM, consts::color_map.at(Color::TURQUOISE),
+                                                                cv::FILLED);
             }
         }
+
+        while (_history[id].size() > _memory)
+        {
+            _history[id].erase(_history[id].begin());
+        }
     }
 
-    for (auto id : to_del) {
-        _history.erase(id);
-        _frame_counter.erase(id);
-    }
+    _prev_frame = frame.clone();
 }
+

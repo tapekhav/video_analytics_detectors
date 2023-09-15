@@ -13,13 +13,20 @@ enum Color
     TURQUOISE
 };
 
-namespace Constants
+namespace consts
 {
-    enum Thickness
+    enum thickness
     {
         THIN = 1,
         MEDIUM = 4,
         THICK = 8
+    };
+
+    enum step
+    {
+        BIG_STEP = 40,
+        AVERAGE_STEP = 10,
+        SMALL_STEP = 5
     };
 
     static const std::map<Color, cv::Scalar> color_map =
@@ -30,24 +37,31 @@ namespace Constants
             {TURQUOISE, cv::Scalar(255, 255, 0)}
     };
 
-    struct Thresholds
+    namespace thresholds
     {
-        static const int MAX_THRESHOLDS = 255;
-        static const int THRESHOLD_VALUE = 50;
+        const int k_max_thresholds = 255;
+        const int k_threshold_value = 50;
     };
 
-    struct Memory
+    namespace mem
     {
-        static const size_t TRAJECTORY_MEMORY = 30;
-        static const size_t MOTION_DETECTION_MEMORY = 15;
+        const size_t k_trajectory_memory = 30;
+        const size_t k_motion_detection_memory = 15;
     };
 
-    struct ExtendedRectangle
+    namespace ext_rect
     {
-        static const int k_max_deviation = 30;
-        static const int k_patience = 8;
-        static const int k_max_elapsed_time = 3;
+        const int k_max_deviation = 30;
+        const int k_patience = 8;
+        const int k_max_elapsed_time = 3;
     };
+
+    namespace four_connectivity
+    {
+        const int size = 4;
+        const int dx[] = {0, 0, -1, 1};
+        const int dy[] = {1, -1, 0, 0};
+    }
 }
 
 #endif //VIDEO_ANALYTICS_DETECTORS_CONSTANTS_H

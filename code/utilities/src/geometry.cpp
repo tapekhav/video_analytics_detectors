@@ -37,3 +37,15 @@ bool geom::isInnerRectangle(const cv::Rect& first, const cv::Rect& second)
 }
 
 
+double geom::findDistanceRectangles(const cv::Rect& first, const cv::Rect& second)
+{
+    return cv::norm(findCenter(first) - findCenter(second));
+}
+
+void geom::mergeRectangles(cv::Rect& first, const cv::Rect& second)
+{
+    first.x = std::min(first.x, second.x);
+    first.y = std::min(first.y, second.y);
+    first.width = std::max(first.x + first.width, second.x + second.width) - first.x;
+    first.height = std::max(first.y + first.height, second.y + second.height) - first.y;
+}
