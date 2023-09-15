@@ -16,9 +16,9 @@ int main()
     std::string output(OUTPUT_DIR);
     output += "output.avi";
 
-    std::unique_ptr<AbstractMotionDetection> aaaa = std::make_unique<NoOpenCVDetection>(cv::Size(zxc.getFrameWidth(),
-                                                                                                 zxc.getFrameHeight()));
-    ObjectTracking z;
+    std::unique_ptr<AbstractMotionDetection> aaaa = std::make_unique<OpenCVDetection>(cv::Size(zxc.getFrameWidth(),
+                                                                                               zxc.getFrameHeight()));
+    ObjectTracking z(zv.front());
     for (auto & frame : zv)
     {
         auto arr = aaaa->detectMotion(frame);

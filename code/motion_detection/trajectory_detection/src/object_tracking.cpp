@@ -1,41 +1,38 @@
 #include <object_tracking.h>
 
-void ObjectTracking::oneRectangleTrajectory(cv::Mat& frame, size_t id, std::vector<cv::Point>& positions,
-                                            std::vector<size_t>& to_del)
-{
-    for (size_t i = 0; i < positions.size() - 1; ++i)
-    {
-        cv::circle(frame, positions[i], consts::thickness::THICK, consts::color_map.at(Color::TURQUOISE),
-                   cv::FILLED);
-    }
-    _frame_counter[id] = _frame_counter.find(id) == _frame_counter.end() ? 1 : _frame_counter[id] + 1;
-
-    if (_frame_counter[id] >= _memory)
-    {
-        positions.erase(positions.begin());
-        if (positions.empty())
-        {
-            to_del.push_back(id);
-        }
-    }
-}
-
-void ObjectTracking::writeTrajectory(cv::Mat &frame, const std::map<size_t, cv::Rect>& rectangles)
+void ObjectTracking::writeTrajectory(cv::Mat& frame, const std::map<size_t, cv::Rect>& rectangles)
 {
     for (auto& figure : rectangles)
     {
-        _history[figure.first].push_back(geom::findCenter(figure.second));
+        size_t id = figure.first;
+        cv::Rect object_box = figure.second;
+
+        std::vector<cv::Point2f> prev_points, curr_points;
+        cv::Point2f center = geom::findCenter(object_box);
+        prev_points.push_back(center);
+
+        std::vector<uchar> status;
+        std::vector<float> err;
+        cv::calcOpticalFlowPyrLK(_prev_frame, frame, prev_points, curr_points, status, err);
+
+        if (!status.empty() && status[0] == 1)
+        {
+            cv::Point2f newCenter = curr_points[0];
+            _history[id].push_back(newCenter);
+
+            for (const auto & i : _history[id])
+            {
+                cv::circle(frame, i, consts::thickness::MEDIUM, consts::color_map.at(Color::TURQUOISE),
+                                                                cv::FILLED);
+            }
+        }
+
+        while (_history[id].size() > _memory)
+        {
+            _history[id].erase(_history[id].begin());
+        }
     }
 
-    std::vector<size_t> to_del;
-    for (auto& kv : _history)
-    {
-        oneRectangleTrajectory(frame, kv.first, kv.second, to_del);
-    }
-
-    for (auto id : to_del)
-    {
-        _history.erase(id);
-        _frame_counter.erase(id);
-    }
+    _prev_frame = frame.clone();
 }
+
