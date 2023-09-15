@@ -8,11 +8,11 @@ class VideoWriter
 public:
     VideoWriter(const std::string& file_name, int frame_width, int frame_height, double fps);
 
-    void writeVideo(const std::vector<cv::Mat>& frames);
+    void writeVideo(const cv::Mat& frame) { _video_writer.write(frame); }
 
-    ~VideoWriter() { _writer.release(); }
+    ~VideoWriter() { _video_writer.release(); }
 private:
-    cv::VideoWriter _writer;
+    cv::VideoWriter _video_writer;
 };
 
 #endif //VIDEO_ANALYTICS_DETECTORS_VIDEO_WRITING_H
