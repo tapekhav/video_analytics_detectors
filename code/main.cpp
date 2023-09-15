@@ -8,7 +8,7 @@
 int main()
 {
     std::string input(VIDEOS_DIR);
-    input += "ahah.avi";
+    input += "ahah_720.avi";
 
     VideoCapture<const std::string> zxc(input);
     auto zv = zxc.displayOriginal();
@@ -16,14 +16,15 @@ int main()
     std::string output(OUTPUT_DIR);
     output += "output.avi";
 
-    std::unique_ptr<AbstractMotionDetection> aaaa = std::make_unique<NoOpenCVDetection>(cv::Size(zxc.getFrameWidth(), zxc.getFrameHeight()));
+    std::unique_ptr<AbstractMotionDetection> aaaa = std::make_unique<NoOpenCVDetection>(cv::Size(zxc.getFrameWidth(),
+                                                                                                 zxc.getFrameHeight()));
     ObjectTracking z;
     for (auto & frame : zv)
     {
         auto arr = aaaa->detectMotion(frame);
-        // z.writeTrajectory(frame, arr);
+        z.writeTrajectory(frame, arr);
     }
 
-    VideoWriter abc(output, zxc.getFrameWidth(), zxc.getFrameHeight(), zxc.getFPS());
+    VideoWriter abc(output, zxc.getFrameWidth(), zxc.getFrameHeight(), 15);
     abc.writeVideo(zv);
 }

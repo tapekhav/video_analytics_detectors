@@ -43,33 +43,30 @@ std::vector<cv::Rect> NoOpenCVDetection::findRectangles(const cv::Mat &cur_frame
     cv::Mat diff = getAbsDiff(cur_frame);
     changeSum(cur_frame);
 
-    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, _dilate_kernel_size);
-    cv::dilate(diff, diff, kernel);
-
     std::vector<cv::Rect> contours;
     findRects(diff, contours);
+
+    mergeRectangles(contours);
 
     return contours;
 }
 
-void NoOpenCVDetection::findRects(const cv::Mat &frame, std::vector<cv::Rect>& contours)
+void NoOpenCVDetection::findRects(const cv::Mat &frame, std::vector<cv::Rect>& rectangles)
 {
     const double min_area = 1e-4 * _params.height * _params.width;
+    cv::Rect rect(0, 0, 0, 0);
 
     for (int y = _step; y < _params.height; y += _step)
     {
         for (int x = _step; x < _params.width; x += _step)
         {
-            if (frame.at<uchar>(y, x) >= _threshold_value - 5)
+            if (frame.at<uchar>(y, x) >= _threshold_value)
             {
-                if (insideContour(contours, cv::Point(x, y)))
-                {
-                    continue;
-                }
-
-                cv::Rect rect;
                 bfs(frame, cv::Point(x, y), rect);
-                contours.push_back(rect);
+                if (rect.area() > min_area)
+                {
+                    rectangles.push_back(rect);
+                }
             }
         }
     }
@@ -83,15 +80,15 @@ void NoOpenCVDetection::bfs(const cv::Mat& frame, const cv::Point& point, cv::Re
     cv::Point max_point((_params.width - point.x) / _step, (_params.height - point.y) / _step);
 
 
-    std::vector<std::vector<bool>> visited((max_point - min_point).y + 1,
-                                            std::vector<bool>((max_point - min_point).x + 1, false));
+    std::vector<std::vector<bool>> visited((max_point - min_point).y + 2,
+                                            std::vector<bool>((max_point - min_point).x + 2, false));
 
     int height = static_cast<int>(visited.size());
     int width = static_cast<int>(visited[0].size());
 
     std::queue<cv::Point> q;
 
-    cv::Point new_point(point.x / _step, point.y / _step);
+    cv::Point new_point(point.x / _step + 1, point.y / _step + 1);
     visited[new_point.y][new_point.x] = true;
     q.push(new_point);
 
@@ -105,7 +102,7 @@ void NoOpenCVDetection::bfs(const cv::Mat& frame, const cv::Point& point, cv::Re
 
 
         cv::Point real_point(offset_x + new_point.x * _step, offset_y + new_point.y * _step);
-        if (frame.at<uchar>(real_point) < _threshold_value - 5)
+        if (frame.at<uchar>(real_point) < _threshold_value)
         {
             continue;
         }
@@ -137,7 +134,6 @@ std::map<size_t, cv::Rect> NoOpenCVDetection::detectMotion(cv::Mat &cur_frame)
 
     auto rectangles = findRectangles(cur_frame);
 
-    mergeRectangles(rectangles);
     deleteInnerRectangles(rectangles);
     findPermanentRectangles(rectangles);
 
@@ -146,17 +142,19 @@ std::map<size_t, cv::Rect> NoOpenCVDetection::detectMotion(cv::Mat &cur_frame)
     return getResult(rectangles);
 }
 
-bool NoOpenCVDetection::insideContour(const std::vector<cv::Rect> &contours, const cv::Point& point) {
+cv::Mat NoOpenCVDetection::gaussianFilter(const cv::Mat &in_frame)
+{
+    return grey::castToGrey(in_frame);
+}
+
+bool NoOpenCVDetection::insideContour(const std::vector<cv::Rect> &contours, const cv::Point& point)
+{
     return std::any_of(contours.begin(), contours.end(), [&point](const cv::Rect& rect)
     {
         return geom::isInnerPoint(point, rect);
     });
 }
 
-cv::Mat NoOpenCVDetection::gaussianFilter(const cv::Mat &in_frame)
-{
-    return grey::castToGrey(in_frame);
-}
 
 void NoOpenCVDetection::mergeRectangles(std::vector<cv::Rect> &rectangles)
 {
