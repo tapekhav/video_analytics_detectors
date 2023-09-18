@@ -51,7 +51,7 @@ namespace consts
 
     namespace ext_rect
     {
-        const int k_max_deviation = 30;
+        const int k_max_deviation = 20;
         const int k_patience = 8;
         const int k_max_elapsed_time = 3;
     };

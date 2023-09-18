@@ -5,7 +5,7 @@
 
 void VideoProcessing::init()
 {
-    setInputName("ahah_720.avi");
+    setInputName("720.avi");
     setOutputName("output.avi");
 
     _capture = std::make_unique<Capture>(_input_name);

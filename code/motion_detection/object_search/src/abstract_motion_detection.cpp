@@ -8,16 +8,16 @@ AbstractMotionDetection::AbstractMotionDetection(cv::Size params,
                                                  int max_deviation,
                                                  int patience,
                                                  int max_elapsed_time)
-                                                : _params(std::move(params)),
-                                                  _threshold_value(threshold),
-                                                  _dilate_kernel_size(std::move(dilate_kernel_size)),
-                                                  _blur_kernel_size(std::move(blur_kernel_size)),
-                                                  _sum_frames(_params, CV_8UC1),
-                                                  _capacity(_frames),
-                                                  _max_deviation(max_deviation),
-                                                  _max_elapsed_time(max_elapsed_time),
-                                                  _patience(patience),
-                                                  _cnt(0) {}
+                                                 : _params(std::move(params)),
+                                                   _threshold_value(threshold),
+                                                   _dilate_kernel_size(std::move(dilate_kernel_size)),
+                                                   _blur_kernel_size(std::move(blur_kernel_size)),
+                                                   _sum_frames(_params, CV_8UC1),
+                                                   _capacity(_frames),
+                                                   _max_deviation(max_deviation),
+                                                   _max_elapsed_time(max_elapsed_time),
+                                                   _patience(patience),
+                                                   _cnt(0) {}
 
 void AbstractMotionDetection::deleteInnerRectangles(std::vector<cv::Rect> &rectangles)
 {

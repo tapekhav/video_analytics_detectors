@@ -53,6 +53,7 @@ std::vector<cv::Rect> NoOpenCVDetection::findRectangles(const cv::Mat &cur_frame
 
 void NoOpenCVDetection::findRects(const cv::Mat &frame, std::vector<cv::Rect>& rectangles)
 {
+    const double max_area = 0.1 * _params.height * _params.width;
     const double min_area = 1e-4 * _params.height * _params.width;
     cv::Rect rect(0, 0, 0, 0);
 
@@ -63,7 +64,7 @@ void NoOpenCVDetection::findRects(const cv::Mat &frame, std::vector<cv::Rect>& r
             if (frame.at<uchar>(y, x) >= _threshold_value)
             {
                 bfs(frame, cv::Point(x, y), rect);
-                if (rect.area() > min_area)
+                if (rect.area() > min_area && rect.area() < max_area)
                 {
                     rectangles.push_back(rect);
                 }
@@ -83,8 +84,8 @@ void NoOpenCVDetection::bfs(const cv::Mat& frame, const cv::Point& point, cv::Re
     std::vector<std::vector<bool>> visited((max_point - min_point).y + 2,
                                             std::vector<bool>((max_point - min_point).x + 2, false));
 
-    int height = static_cast<int>(visited.size());
-    int width = static_cast<int>(visited[0].size());
+    const int height = static_cast<int>(visited.size());
+    const int width = static_cast<int>(visited[0].size());
 
     std::queue<cv::Point> q;
 
@@ -92,8 +93,8 @@ void NoOpenCVDetection::bfs(const cv::Mat& frame, const cv::Point& point, cv::Re
     visited[new_point.y][new_point.x] = true;
     q.push(new_point);
 
-    int offset_x = point.x % _step;
-    int offset_y = point.y % _step;
+    const int offset_x = point.x % _step;
+    const int offset_y = point.y % _step;
 
     while (!q.empty())
     {
@@ -130,22 +131,13 @@ cv::Mat NoOpenCVDetection::gaussianFilter(const cv::Mat &in_frame)
     return grey::castToGrey(in_frame);
 }
 
-bool NoOpenCVDetection::insideContour(const std::vector<cv::Rect> &contours, const cv::Point& point)
-{
-    return std::any_of(contours.begin(), contours.end(), [&point](const cv::Rect& rect)
-    {
-        return geom::isInnerPoint(point, rect);
-    });
-}
-
-
 void NoOpenCVDetection::mergeRectangles(std::vector<cv::Rect> &rectangles)
 {
     auto isShortDistance = [this](const cv::Rect& first, const cv::Rect& second)
     {
         auto min_dist = std::min(first.width / 2 + second.width / 2, first.height / 2 + second.height / 2);
 
-        return geom::findDistanceRectangles(first, second) < min_dist + 2 * _step;
+        return geom::findDistanceRectangles(first, second) < min_dist + 3 * _step;
     };
 
     for (size_t i = 0; i < rectangles.size() - 1; ++i)
