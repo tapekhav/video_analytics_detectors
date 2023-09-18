@@ -28,21 +28,6 @@ cv::Mat VideoCapture<T>::displayOriginal()
     _cam >> frame;
 
     return frame;
-
-    /*if (frame.empty())
-    {
-        return result;
-    }
-    result.push_back(frame);
-
-    cv::imshow("Cam", frame);
-
-    char button = static_cast<char>(cv::waitKey(25));
-    if (button == 27)
-    {
-        return result;
-    }*/
-
 }
 
 
