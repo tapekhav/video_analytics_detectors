@@ -18,21 +18,21 @@ OpenCVDetection::OpenCVDetection(cv::Size params,
                                                            patience,
                                                            max_elapsed_time) {}
 
-cv::Mat OpenCVDetection::getAbsDiff(const cv::Mat &cur_frame) const
+cv::Mat OpenCVDetection::getAbsDiff(const cv::Mat &frame) const
 {
     cv::Mat diff, out;
     auto sum = getMeanSum();
 
-    cv::cvtColor(cur_frame, out, cv::COLOR_BGR2GRAY);
+    cv::cvtColor(frame, out, cv::COLOR_BGR2GRAY);
     cv::absdiff(out, sum, diff);
 
     return diff;
 }
 
-std::vector<std::vector<cv::Point>> OpenCVDetection::findContours(const cv::Mat &cur_frame)
+std::vector<std::vector<cv::Point>> OpenCVDetection::findContours(const cv::Mat &frame)
 {
-    cv::Mat diff = getAbsDiff(cur_frame);
-    changeSum(cur_frame);
+    cv::Mat diff = getAbsDiff(frame);
+    changeSum(frame);
 
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, _dilate_kernel_size);
     cv::dilate(diff, diff, kernel);

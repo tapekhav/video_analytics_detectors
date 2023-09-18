@@ -5,8 +5,9 @@
 
 namespace grey
 {
+    //! A lambda function that converts a color pixel to grayscale.
     const auto castPixel = [](uchar blue, uchar green, uchar red) { return 0.2989 * red + 0.5870 * green + 0.1140 * blue; };
-
+    //! Convert a color image to grayscale.
     cv::Mat castToGrey(const cv::Mat& frame);
 }
 

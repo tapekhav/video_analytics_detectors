@@ -5,6 +5,8 @@
 
 #include <opencv4/opencv2/opencv.hpp>
 
+//! Declaration of constants and enums.
+
 enum Color
 {
     RED,

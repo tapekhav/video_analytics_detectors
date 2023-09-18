@@ -21,12 +21,7 @@ NoOpenCVDetection::NoOpenCVDetection(cv::Size params,
                                                                max_elapsed_time),
                                                                _blur(9, 3.0),
                                                                _step(step)
-                                                               {
-                                                                    for (size_t i = 0; i < _params.height; ++i)
-                                                                    {
-                                                                        _visited.emplace_back(_params.width, false);
-                                                                    }
-                                                               }
+                                                               {}
 
 
 cv::Mat NoOpenCVDetection::getAbsDiff(const cv::Mat &cur_frame) const
